@@ -15,7 +15,7 @@ a {
 }
 
 a:active {
-    color: #bbb;
+    color: #090;
 }
 
 a:visited {
@@ -45,7 +45,7 @@ line, .tikkies {
 
 .grid {
     fill: none;
-    stroke: #000;
+    stroke: #FFF;
     stroke-width: .3px;
 }
 
@@ -60,18 +60,14 @@ line, .tikkies {
     color: white;
 }
 
-#header, #subheader, a:hover, #bijbakje, #chooseI, #chooseII, #chooseIII, #histolabel_x, #histolabel_y, .stat, .statlabel {
-    text-shadow: .5px .5px 1px #000;
-}
-
 #header {
     position: absolute;
-    top: 498px;
+    top: 542px;
     left: 390px;
     padding: 0px;
     margin: 0px;
     font: 36px 'Arial Black', Impact;
-    color: azure;
+    color: white;
     z-index: 10;
 }
 
@@ -86,14 +82,8 @@ line, .tikkies {
     z-index: 11;
 }
 
-#experiments, #watertypes, #watersources, #schaalbakje, div.tooltip {
-    border: 1px solid midnightblue;
-    border-radius: 4px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    box-shadow: 4px 4px 2px dimgrey;
-    -moz-box-shadow: 4px 4px 2px dimgrey;
-    -webkit-box-shadow: 4px 4px 2px dimgrey;
+#experiments, #watertypes, #watersources,  div.tooltip {
+    border: 1px solid grey;
 }
 
 #map {
@@ -105,8 +95,8 @@ line, .tikkies {
 
 #choosers {
     position: absolute;
-    top: 15px;
-    left: 248px;
+    top: 30px;
+    left: 100px;
     z-index: 100;
     opacity: 0;
 }
@@ -136,34 +126,45 @@ line, .tikkies {
 }
 
 #bijbakje {
+	font-size:120%;
     position: absolute;
-    top: 18px;
-    left: 15px;
+    top: 200px;
+    left: 20px;
     width: 100px;
-    text-align: right;
+    text-align: left;
     opacity: 0;
 }
 
 #schaalbakje {
     position: absolute;
-    top: 15px;
-    left: 119px;
+    top: 220px;
+    left: 20px;
     opacity: 0;
 }
-
+#minScale{
+    position: absolute;
+    top: 240px;
+    left: 15px;
+}
+#maxScale{
+    position: absolute;
+    top: 240px;
+    left:115px;
+}
 #theNumbers {
     position: absolute;
-    left: 8px;
-    top: 92px;
-    width: 220px;
-    text-align: right;
+    left: 5px;
+    top: 480px;
+    width: 200px;
+    text-align: left;
     z-index: 10;
+    padding: 5px 5px 5px 15px;
 }
 
 #histo {
     position: absolute;
-    left: 8px;
-    top: 315px;
+    left: 0px;
+    top: 250px;
 }
 
 #histolabel_x, #histolabel_y {
@@ -179,13 +180,15 @@ line, .tikkies {
 
 #histolabel_x {
     top: 205px;
-    left: 170px;
+    left: 150px;
+    width:50px;
+    text-align: right;
 }
 
 #source {
     position: absolute;
-    bottom: 6px;
-    left: 390px;
+    bottom: 60px;
+    left: 540px;
     color: #999;
 }
 
@@ -193,8 +196,8 @@ div.tooltip {
     position: absolute;
     width: 200px;
     height: 90px;
-    padding: 6px 2px 6px 2px;
-    text-shadow: .5px .5px 1px dimgrey;
+    padding: 6px;
+    /*text-shadow: .5px .5px 1px dimgrey;*/
     /*    font: 24px sans-serif; */
     background: red;
     color: black;
@@ -202,19 +205,29 @@ div.tooltip {
     border-radius: 4px;
     -webkit-border-radius: 4px;
     -mozilla-border-radius: 4px;
-    text-align: center;
+    text-align: left;
     z-index: -100;
     opacity: 0;
 }
 
 #details {
-    display: none;
-    background: #ccc;
-    opacity: 0.8;
-    z-index: 9000;
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 100px;
+    left: 220px;
+	min-width: 360px;
+	max-width: 730px;
+    background: #ccc;
+    display: none;
+    z-index: 9000;
+	overflow: auto;
+    opacity: 0.9;
+}
+
+#details .cityname{
+	width: 120px;
+	text-align: right;
+	font-size: 8px;
+	color:#444
 }
 
 #details line, #details .tikkies {
@@ -225,29 +238,32 @@ div.tooltip {
 
 #details .grid {
     fill: none;
-    stroke: #000;
-    stroke-width: 1px;
+    stroke: #FFF;
+    stroke-width: .3px;
 }
 
-#details .astxt, #details .bartxt {
+#details .astxt {
     font-size: 12px;
     fill: #000;
     font-weight: bold;
 }
 
-#close {
-    position: absolute;
-    left: 10px;
-    top: 10px;
-    color: #FF9966;
-    z-index: 9002;
-    font-size: 18px;
+#details .astiktxt {
+    font-size: 8px;
+    fill: #000;
     font-weight: bold;
 }
+#details .bartxt {
+	font-family: "Arial Narrow";
+    fill: #000;
+}
 
-#close:hover {
-    color: red;
-    cursor: pointer;
+#close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: dimgrey;
+    z-index: 9002;
 }
 
 
@@ -304,15 +320,17 @@ div.tooltip {
 </div>
 <div id="bijbakje"></div>
 <div id="schaalbakje"></div>
+<div id="minScale"></div>
+<div id="maxScale"></div>
 
 <div id="theNumbers"></div>
 
 <div id="histo">
-    <div id="histolabel_x">result</div>
+    <div id="histolabel_x">pH</div>
     <div id="histolabel_y">frequency</div>
 </div>
 
-<div id="details"><span id="close">CLOSE</span></div>
+<div id="details"><span id="close">click window to close...</span></div>
 
 <script>
 
@@ -328,13 +346,13 @@ var reeks, globalData, globalfirstVar, globalsecondVar, globalfirstVarlabel, glo
 var measurementCircles, detailsCircles = null;
 
 var margin = {top:0, right:0, bottom:0, left:0},
-        width = 1048 - margin.left - margin.right,
-        height = 560 - margin.top - margin.bottom;
+        width = 960 - margin.left - margin.right,
+        height = 600 - margin.top - margin.bottom;
 
 
-var projection = d3.geo.mercator()
-        .scale(width)
-        .translate([width / 2.26, height / 1.6]);
+var projection = d3.geo.equirectangular()
+        .scale(width+10)
+        .translate([width / 2.26 +50, height / 1.9]);
 
 
 var path = d3.geo.path()
@@ -387,7 +405,7 @@ svg.append("g").attr("id", "datapoints");
  * setup color key holder and gradient
  **/
 var w = 100,
-        h = 17;
+h = 14;
 
 var bakje = d3.select("#schaalbakje")
         .append("svg")
@@ -403,7 +421,6 @@ var gradient = bakje.append("svg:defs")
         .attr("x2", "100%")
         .attr("y2", "0%")
         .attr("spreadMethod", "pad");
-
 
 /**
  * setup histogram
@@ -458,30 +475,17 @@ d3.selectAll("#histolabel_y, #histolabel_x")
  * setup country details
  */
 
-var cropw = 260,
-        croph = 50,
-        detw = width - cropw / 2,
-        deth = height - croph;
+
+var cropw = 50,
+    croph = 50,
+    detw = width / 1.55 - cropw / 5,
+    deth = height / 2 - croph / 3;
 
 var details = d3.select("#details")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height);
+				.append("svg")
+				.attr("width", width/1.4)
+				.attr("height", height/1.4);
 
-details.append("line")
-        .attr("x1", cropw)
-        .attr("x2", detw)
-        .attr("y1", deth)
-        .attr("y2", deth)
-        .style("opacity", 1);
-
-
-details.append("line")
-        .attr("x1", cropw)
-        .attr("x2", cropw)
-        .attr("y1", croph - 10)
-        .attr("y2", deth)
-        .style("opacity", 1);
 
 
 /**
@@ -551,342 +555,12 @@ function initMap(data) {
     }
 }
 
-function getCountryTempr(coll, name) {
 
-    var watertype = d3.select("#watertypes").property("value");
-    var watersource = d3.select("#watersources").property("value");
-
-
-    var arr = [];
-
-    if (isExists(coll[name])) {
-        var cdata = coll[name];
-        for (var i in cdata) {
-            if ((watertype == "" || watertype == cdata[i].waterType) &&
-                    (watersource == "" || watersource == cdata[i].waterSource)) {
-                arr.push(cdata[i]);
-            }
-        }
-    }
-    return arr;
-}
-;
-
-function overpath(d) {
-    var cn = d.properties.name;
-    if (getCountryTempr(lastData, cn).length < 1)
-        return;
-
-    var item = d3.select(this);
-    item.transition()
-        .duration(250).attr('fill', '#666');
-    item.style("cursor", "pointer");
-    tooltipdiv
-            .html("<span class=\"statlabel\">" + cn + "</span>")
-            .style("background", "#ddd")
-            .style("width", "auto")
-            .style("height", "auto")
-            .style("z-index", 100)
-            .transition()
-            .duration(250)
-            .style("opacity", 1);
-}
-
-function moverpath() {
-    tooltipdiv
-            .style("top", (d3.event.pageY + 16) + "px")
-            .style("left", (d3.event.pageX + 16) + "px");
-}
-
-function outpath(d) {
-    var item = d3.select(this);
-    item.style("cursor", "default");
-    tooltipdiv
-            .transition()
-            .duration(250)
-            .style("opacity", 1e-6)
-            .style("z-index", -100)
-            .style("width", "200px")
-            .style("height", "90px");
-    item.transition()
-        .duration(250).attr('fill', '#222');
-}
-
-var selectedPath = null;
-
-function clover(d) {
-    var item = d3.select(this);
-    var city = item.attr("city");
-    var school = item.attr("school");
-    var ph = item.attr("ph");
-    var tph = item.attr("tph");
-    item.transition()
-        .duration(250).
-      style("fill", function() {
-        return d3.rgb(c(ph)).brighter();
-    });
-    tooltipdiv
-            .html('<span class="statlabel">School: </span><span  class="stat">' + school + '</span>' +
-            '<br /><span class="statlabel">City: </span><span  class="stat">' + city + '</span>' +
-            '<br /><span class="statlabel">' + globalfirstVarlabel + '</span><span  class="stat">' + ph + '</span>' +
-            '<br /><span class="statlabel">' + globalsecondVarlabel + '</span><span  class="stat">' + tph + '</span>' )
-            .style("background", function () {
-                return c(ph);
-            })
-            .style("width", "auto")
-            .style("height", "auto")
-            .style("z-index", 9999)
-            .transition()
-            .duration(250)
-            .style("opacity", 1);
-}
-
-function clmove() {
-    tooltipdiv
-            .style("top", (d3.event.pageY + 16) + "px")
-            .style("left", (d3.event.pageX + 16) + "px");
-}
-
-function clout(d) {
-    var item = d3.select(this);
-    item.transition()
-      .duration(250)
-      .style("fill", function() {
-        return c(item.attr("ph"));
-    });
-    tooltipdiv
-            .transition()
-            .duration(250)
-            .style("opacity", 1e-6)
-            .style("z-index", -100)
-            .style("width", "200px")
-            .style("height", "90px");
-}
-
-function clickPath(d) {
-    var cn = d.properties.name;
-    var arr = getCountryTempr(lastData, cn);
-    if (arr.length < 1)
-        return;
-
-    var item = d3.select(this);
-    seletedPath = item;
-    item.attr('fill', '#FFFCCC');
-    d3.select("#histo")
-            .style("background", "#444")
-            .style("z-index", 9001);
-    doHistogram(arr.map(function (d) {
-        return d[globalfirstVar];
-    }));
-    var dc = d3.select("#details").style('display', 'block');
-    d3.select("#close").on("click", function () {
-        detailsCircles = null;
-        d3.select("#details").style('display', 'none');
-        d3.select("#histo").style("background", "none");
-
-        //this is a lot of html within the code
-        d3.select("#theNumbers")
-                .html("<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" +
-                reeks.length + "</span><br/><br/><span class=\"statlabel\">average " +
-                globalfirstVarlabel + "</span><span class=\"stat\">" + gemfirstVar +
-                "</span><br/><span class=\"statlabel\">average " + globalsecondVarlabel +
-                "</span><span class=\"stat\">" + gemsecondVar + "</span>")
-                .style("z-index", 10);
-
-        doHistogram(reeks);
-        if (!isExists(selectedPath))
-            return;
-        selectedPath.attr("fill", "#222");
-        selectedPath = null;
-    });
-
-    //sourceofwater
-    //school
-
-    /*var nest = arr.nest()
-     .key(function(d) { return d["city"]; });*/
-
-    console.log(arr.map(function (d) {
-        return d.city;
-    }));
-
-    var x = d3.scale.ordinal()
-            .domain(arr.map(function (d) {
-        return d.city;
-    }))
-            .rangeBands([cropw + 20, detw - 20]);
-
-    var mf = d3.round(d3.mean(arr, function (d) {
-        return d[globalfirstVar];
-    }), 2),
-            mt = d3.round(d3.mean(arr, function (d) {
-                return d[globalsecondVar];
-            }), 2);
-    var minf = d3.min(arr, function (d) {
-        return d[globalfirstVar];
-    });
-    var maxf = d3.max(arr, function (d) {
-        return d[globalfirstVar];
-    });
-
-    var y = d3.scale.linear()
-            .domain([minf - mf / 4, maxf + mf / 4])
-            .range([0, deth - croph]);
-
-    //this is a lot of html within the code
-    d3.select("#theNumbers")
-            .html("<span class=\"statlabel\">Country: </span><span class=\"stat\">" +
-            cn + "</span><br />" +
-            "<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" +
-            arr.length + "</span><br/><br/><span class=\"statlabel\">average " +
-            globalfirstVarlabel + "</span><span class=\"stat\">" + mf +
-            "</span><br/><span class=\"statlabel\">average " + globalsecondVarlabel +
-            "</span><span class=\"stat\">" + mt + "</span>")
-            .style("z-index", 9003);
-
-    details.selectAll("g").remove();
-
-    details.append("svg:g")
-            .style("opacity", 1)
-            .attr("transform", "translate(0," + (croph - 20) + ")")
-            .append("text")
-            .attr("class", "astxt")
-            .attr("x", cropw - 20)
-            .attr("dy", ".71em")
-            .attr("text-anchor", "middle")
-            .text("pH")
-            .style("fill", "#5D5DE9");
-
-    details.append("svg:g")
-            .style("opacity", 1)
-            .attr("transform", "translate(" + (detw + 5) + "," + (deth + 5) + ")")
-            .append("text")
-            .attr("class", "astxt")
-            .attr("dy", ".71em")
-            .attr("text-anchor", "middle")
-            .text("cities")
-            .style("fill", "#5D5DE9");
-
-    var rules = details.selectAll("g.rule")
-            .data(y.ticks(10))
-            .enter()
-            .append("svg:g")
-            .style("opacity", 1)
-            .attr("transform", function (d) {
-                return "translate(0," + (deth - y(d)) + ")";
-            });
-
-
-    rules.append("line")
-            .attr("class", "tikkies")
-            .attr("x1", cropw - 1)
-            .attr("x2", cropw - 5);
-
-
-    rules.append("line")
-            .attr("class", "grid")
-            .attr("x1", cropw + 1)
-            .attr("x2", detw);
-
-
-    rules.append("text")
-            .attr("class", "astxt")
-            .attr("x", cropw - 15)
-            .attr("dy", ".71em")
-            .attr("text-anchor", "middle")
-            .text(y.tickFormat(10))
-            .style("display", function (d) {
-                return d == 0 ? "none" : null
-            });
-
-    rules.transition()
-            .delay(4000)
-            .duration(250)
-            .style("opacity", 1);
-
-    var qt = deth * 3;
-
-    var rt = d3.scale.linear()
-            .domain(d3.extent(arr.map(function (d) {
-        return d[globalsecondVar];
-    })))
-            .range([3 * (qt / deth), 9 * (qt / deth)]);
-
-    var bars = details.selectAll("g.bars")
-            .data(arr)
-            .enter().append("svg:g").attr("class", "cldetails")
-            .attr("transform", function (d) {
-              return "translate(" + (x(d["city"]) + x.rangeBand() / 2 )  + ",0" + /*(deth - y(d[globalfirstVar])) + */")";
-            });
-
-
-    bars.append("circle")
-            .attr("city", function (d) { return d.city; })
-            .attr("school", function (d) { return d.school; })
-            .attr("ph", function(d) { return d[globalfirstVar]; })
-            .attr("tph", function(d) { return d[globalsecondVar]; })
-            .attr("r", function (d) {
-                return rt(d[globalsecondVar]);
-            })
-            .style("fill", function (d) {
-                return c(d[globalfirstVar]);
-            })
-            .style("stroke", function (d) {
-                return d3.rgb(c(d[globalfirstVar])).darker();
-            })
-            .attr("transform", function (d) {
-                return "translate(0," + (deth - y(d[globalfirstVar])) + ")";
-            })
-            .on("mouseover", clover)
-            .on("mousemove", clmove)
-            .on("mouseout", clout);
-
-    bars.append("circle")
-        //.attr("class", "hisrect")
-            .attr("r", 2)
-            .style("fill", function (d) {
-                return d3.rgb(c(d[globalfirstVar])).darker();
-            })
-            .style("stroke", "none")
-            .attr("transform", function (d) {
-                return "translate(0," + (deth - y(d[globalfirstVar])) + ")";
-            });
-
-    bars.append("line")
-            .style("stroke", function (d) {
-                return d3.rgb(c(d[globalfirstVar])).darker();
-            })
-        //.attr("x1", function(d) {return x(d["city"]); })
-        //.attr("x2", function(d) {return x(d["city"]); })
-            .style("opacity", 0.4)
-            .attr("y1", deth)
-            .attr("y2", function (d) {
-                return (deth - y(d[globalfirstVar]));
-            });
-
-    bars.append("text")
-            .style("fill", function (d) {
-                return "#5D5DE9";
-            })
-            .style("writing-mode", "tb-rl")
-        //.style("glyph-orientation-vertical", 0)
-            .style("font-size", "11px")
-            .attr("y", function (d) {
-                return deth - ((d["city"].length) * 11 / 2);
-            })
-            .attr("x", 5)
-            .style("text-align", "right")
-            .text(function (d) {
-                return d["city"];
-            });
-
-    detailsCircles = details.selectAll(".cldetails");
-}
 
 /**
  *Draw map
  **/
-    //d3.json("world-countries.json", function(collection) {
+//d3.json("world-countries.json", function(collection) {
 d3.json("/sites/default/files/sprint/data/world-countries.json", function (collection) {
 
     feature = feature
@@ -902,7 +576,7 @@ d3.json("/sites/default/files/sprint/data/world-countries.json", function (colle
 
     activeDataset = "gwe_experiment1_v1";
 
-    swap_to_Exp("#FF9999", "#8DEB8D", "#8DB4EB", "pH ", "ph", "temperature (in \u00b0C): ", "temperature");
+    swap_to_Exp("#CC0033", "#33FF33", "#3333CC", "pH ", "ph", "temperature (in \u00b0C): ", "temperature");
 });
 
 
@@ -917,7 +591,7 @@ function updateDataset() {
         activeDataset = picker;
 
     if (picker == "gwe_experiment1_v1") {
-        swap_to_Exp("#FF9999", "#8DEB8D", "#8DB4EB", "pH ", "ph", "temperature (in \u00b0C): ", "temperature");
+        swap_to_Exp("#CC0033", "#33FF33", "#3333CC", "pH ", "ph", "temperature (in \u00b0C): ", "temperature");
     }
 
     else
@@ -966,7 +640,7 @@ function swap_to_Exp(lowColor, midColor, highColor, firstVarlabel, firstVar, sec
     /**
      * Load data from JSON and draw visualization
      **/
-//d3.json(activeDataset + ".json", function(data) {
+	//d3.json(activeDataset + ".json", function(data) {
     d3.json("/sites/default/files/sprint/data/" + activeDataset + ".json", function (data) {
 
         /*
@@ -1003,12 +677,6 @@ function swap_to_Exp(lowColor, midColor, highColor, firstVarlabel, firstVar, sec
             return d[firstVar];
         });
 
-        // scale for temperature to radius
-        r.domain(d3.extent(data.map(function (d) {
-            return d[secondVar];
-        })))
-                .range([1 * (q / width), 6 * (q / width)]);
-
 
         // scale for ph to color
         //c.domain(d3.extent(data.map(function(d) { return d[firstVar]; })))
@@ -1022,6 +690,8 @@ function swap_to_Exp(lowColor, midColor, highColor, firstVarlabel, firstVar, sec
 
 
         doHistogram();
+        
+        
 
         /**
          *Gradient legend for pH values / needs tickmarks
@@ -1047,11 +717,17 @@ function swap_to_Exp(lowColor, midColor, highColor, firstVarlabel, firstVar, sec
         bakje.append("rect")
                 .attr("width", w)
                 .attr("height", h)
-                .attr("rx", "4px")
-                .attr("ry", "4px")
                 .style("fill", "url(#gradient)");
 
         d3.select("#bijbakje").text(firstVarlabel);
+            
+        d3.select("#histolabel_x").html(firstVarlabel);
+
+		var minVar = d3.min(data, function (d) { return d[globalfirstVar]; });	
+    	var maxVar = d3.max(data, function (d) { return d[globalfirstVar]; });
+        d3.select("#minScale").text(minVar);
+        d3.select("#maxScale").text(maxVar);
+        
 
         /* attempt at adding an axis to the legend
          bakas = d3.svg.axis()
@@ -1094,34 +770,16 @@ function swap_to_Exp(lowColor, midColor, highColor, firstVarlabel, firstVar, sec
                 .on("mousemove", toolmover)
                 .on("mouseout", tooltapper)
                 .on("click", ripple)
-                .attr("visibility", "visible")/*function(d) {
-         var watertype = d3.select("#watertypes").property("value");
-         var watersource = d3.select("#watersources").property("value");
-         return (watertype == "" || watertype == d.waterType) && (watersource == "" || watersource == d.waterSource) ? "visible" : "hidden";
-         })*/
-
-
-                .transition()
-                .delay(100)
-                .duration(1000)
-                .attr("r", function (d) {
-                    return r(d[secondVar]);
-                })
-
+                .attr("visibility", "visible")
+                .attr("r", 3)
                 .transition()
                 .delay(1200)
                 .duration(1250)
-            /*			.attr("fill", function(d) {
-             if (d.ph < 6.5) return "steelblue";
-             else if (d.ph > 8) return "firebrick";
-             else return "#aaa"})
-             */
                 .attr("fill", function (d) {
                     return c(d[firstVar]);
                 })
-                .attr("stroke", function (d) {
-                    return d3.rgb(c(d[firstVar])).darker();
-                })
+                .attr("stroke", 'black')
+                .attr("stroke-width",0.2);
 
         measurementCircles = svg.select('#datapoints').selectAll('.measurementCircle');
 
@@ -1136,7 +794,7 @@ function swap_to_Exp(lowColor, midColor, highColor, firstVarlabel, firstVar, sec
 
         //this is a lot of html within the code
         d3.select("#theNumbers")
-                .html("<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" + reeks.length + "</span><br/><br/><span class=\"statlabel\">average " + firstVarlabel + "</span><span class=\"stat\">" + gemfirstVar + "</span><br/><span class=\"statlabel\">average " + secondVarlabel + "</span><span class=\"stat\">" + gemsecondVar + "</span>");
+                .html("<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" + reeks.length + "</span><br/><span class=\"statlabel\">average " + firstVarlabel + "</span><span class=\"stat\">" + gemfirstVar + "</span><br/><span class=\"statlabel\">average " + secondVarlabel + "</span><span class=\"stat\">" + gemsecondVar + "</span>");
 
 
         //This is quite a lot of html code inside the d3 code - isn't there a better way to do this?
@@ -1230,7 +888,8 @@ function doHistogram(reeks) {
     rules.append("line")
             .attr("class", "grid")
             .attr("x1", 1)
-            .attr("x2", histw);
+            .attr("x2", histw)
+            .attr("stroke","white");
 
 
     rules.append("text")
@@ -1417,8 +1076,8 @@ function updateVisibility() {
     ;
 
     d3.select("#theNumbers")
-            .html("<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" + reeks.length + "</span><br/><br/><span class=\"statlabel\">average " + globalfirstVarlabel + "</span><span class=\"stat\">" + gemfirstVar + "</span><br/><span class=\"statlabel\">average " + globalsecondVarlabel + "</span><span class=\"stat\">" + gemsecondVar + "</span>");
-
+            .html("<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" + reeks.length + "</span><br/><span class=\"statlabel\">average " + globalfirstVarlabel + "</span><span class=\"stat\">" + gemfirstVar + "</span><br/><span class=\"statlabel\">average " + globalsecondVarlabel + "</span><span class=\"stat\">" + gemsecondVar + "</span>");
+            
 
 }
 ;
@@ -1440,10 +1099,10 @@ function move() {
     q = projection.scale() / 3;
     r.range([1 * (q / width), 6 * (q / width)]);
 
-    d3.select("#datapoints").selectAll("circle")
+   /* d3.select("#datapoints").selectAll("circle")
             .attr("r", function (d) {
                 return r(d[globalsecondVar]);
-            })
+            })*/
 
 }
 ;
@@ -1487,7 +1146,301 @@ function ripple(d) {
             })
 }
 ;
+function getCountryTempr(coll, name) {
 
+    var watertype = d3.select("#watertypes").property("value");
+    var watersource = d3.select("#watersources").property("value");
+
+
+    var arr = [];
+
+    if (isExists(coll[name])) {
+        var cdata = coll[name];
+        for (var i in cdata) {
+            if ((watertype == "" || watertype == cdata[i].waterType) &&
+                    (watersource == "" || watersource == cdata[i].waterSource)) {
+                arr.push(cdata[i]);
+            }
+        }
+    }
+    return arr;
+}
+;
+
+function overpath(d) {
+    var cn = d.properties.name;
+    if (getCountryTempr(lastData, cn).length < 1)
+        return;
+
+    var item = d3.select(this);
+    item.transition()
+        .duration(250).attr('fill', '#666');
+    item.style("cursor", "pointer");
+    tooltipdiv
+            .html("<span class=\"statlabel\">" + cn + "</span>")
+            .style("background", "#ddd")
+            .style("width", "auto")
+            .style("height", "auto")
+            .style("z-index", 100)
+            .transition()
+            .duration(250)
+            .style("opacity", 1);
+}
+
+function moverpath() {
+    tooltipdiv
+            .style("top", (d3.event.pageY + 16) + "px")
+            .style("left", (d3.event.pageX + 16) + "px");
+}
+
+function outpath(d) {
+    var item = d3.select(this);
+    item.style("cursor", "default");
+    tooltipdiv
+            .transition()
+            .duration(250)
+            .style("opacity", 1e-6)
+            .style("z-index", -100)
+            .style("width", "200px")
+            .style("height", "90px");
+    item.transition()
+        .duration(250).attr('fill', '#222');
+}
+
+var selectedPath = null;
+
+function clover(d) {
+    var item = d3.select(this);
+    var city = item.attr("city");
+    var school = item.attr("school");
+    var ph = item.attr("ph");
+    var tph = item.attr("tph");
+    item.transition()
+        .duration(250).
+      style("fill", function() {
+        return d3.rgb(c(ph)).brighter();
+    });
+    tooltipdiv
+            .html('<span class="statlabel">School: </span><span  class="stat">' + school + '</span>' +
+            '<br /><span class="statlabel">City: </span><span  class="stat">' + city + '</span>' +
+            '<br /><span class="statlabel">' + globalfirstVarlabel + '</span><span  class="stat">' + ph + '</span>' +
+            '<br /><span class="statlabel">' + globalsecondVarlabel + '</span><span  class="stat">' + tph + '</span>' )
+            .style("background", function () {
+                return c(ph);
+            })
+            .style("width", "auto")
+            .style("height", "auto")
+            .style("z-index", 9999)
+            .transition()
+            .duration(250)
+            .style("opacity", 1);
+}
+
+function clmove() {
+    tooltipdiv
+            .style("top", (d3.event.pageY + 16) + "px")
+            .style("left", (d3.event.pageX + 16) + "px");
+}
+
+function clout(d) {
+    var item = d3.select(this);
+    item.transition()
+      .duration(250)
+      .style("fill", function() {
+        return c(item.attr("ph"));
+    });
+    tooltipdiv
+            .transition()
+            .duration(250)
+            .style("opacity", 1e-6)
+            .style("z-index", -100)
+            .style("width", "200px")
+            .style("height", "90px");
+}
+
+function clickPath(d) {
+    var cn = d.properties.name;
+    var arr = getCountryTempr(lastData, cn);
+    if (arr.length < 1)
+        return;
+
+    var item = d3.select(this);
+    seletedPath = item;
+    item.attr('fill', '#FFFCCC');
+    d3.select("#histo")
+            .style("z-index", 9001);
+    
+    doHistogram(arr.map(function (d) {
+        return d[globalfirstVar];
+    }));
+    var dc = d3.select("#details").style('display', 'block');
+
+ // gives an array of unique city names
+	 var arrNames = d3.keys(d3.nest()
+					          .key(function(d) { return d.city; })
+							  .map(arr)); 	  
+	  
+// gives an array of all data nested under the city names
+	var arrTot = d3.nest()
+				   .key(function(d) { return d.city; })
+				   .map(arr); 	  
+
+	var arrNamesLang = arrNames.length;
+
+    //console.log(arr);
+
+//	detw = 180 + arr.length * 4;
+	detw = 180 + arrNamesLang * 8;
+	details.attr("width", detw + 30);
+	
+    var mf = d3.round(d3.mean(arr, function (d) { return d[globalfirstVar]; }), 2),
+        mt = d3.round(d3.mean(arr, function (d) { return d[globalsecondVar]; }), 2); 
+		
+    var minf = d3.min(arr, function (d) { return d[globalfirstVar]; });	
+    var maxf = d3.max(arr, function (d) { return d[globalfirstVar]; });
+	
+    var x = d3.scale.ordinal()
+				    .domain(arr.map(function (d) { return d.city; }))
+					.rangeBands([cropw + 10, detw]);
+
+    var y = d3.scale.linear()
+					.domain([minf - mf / 4, maxf + mf / 4])
+					.range([0, deth - croph]);
+
+	//console.log(y);
+	
+    //this is a lot of html within the code
+    d3.select("#theNumbers")
+      .html("<span class=\"statlabel\">country: </span><span class=\"stat\">" + cn + "</span><br />" + "<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" + arr.length + "</span><br/><span class=\"statlabel\">average " + globalfirstVarlabel + ": </span><span class=\"stat\">" + mf + "</span><br/><span class=\"statlabel\">average " + globalsecondVarlabel + ": </span><span class=\"stat\">" + mt + "</span>")
+      .style("z-index", 9003);
+			
+    details.selectAll("g").remove();
+
+    details.append("svg:g")
+           .attr("transform", "translate(" + (cropw - 20) + "," + (croph - 16) + ")")
+           .append("text")
+           .attr("class", "astxt")
+           .text(globalfirstVarlabel)//"pH"); //needs to update with choice of experiment!!!
+
+    details.append("svg:g")
+           .attr("transform", "translate(" + (detw + 34) + "," + (deth + 18) + ")")
+           .append("text")
+           .attr("class", "astxt")
+           .text("cities");
+
+    var rules = details.selectAll("g.rule")
+					   .data(y.ticks(10))
+					   .enter()
+					   .append("svg:g")
+					   .attr("transform", function (d) { return "translate(0," + (deth - y(d)) + ")"; });
+
+/*
+    rules.append("line")
+            .attr("class", "tikkies")
+            .attr("x1", cropw - 1)
+            .attr("x2", cropw - 5);
+*/
+
+    rules.append("line")
+         .attr("class", "grid")
+         .attr("x1", cropw)
+         .attr("x2", detw);
+
+
+    rules.append("text")
+         .attr("class", "astiktxt")
+         .attr("x", cropw - 18)
+		 .attr("text-align", "right")
+		 .text(y.tickFormat(10))
+         .style("display", function (d) { return d == 0 ? "none" : null });
+
+    var qt = deth; //??
+
+    var rt = d3.scale.linear()
+			   .domain(d3.extent(arr.map(function (d) { return d[globalsecondVar]; })))
+               .range([2, 8])//([3 * (qt / deth), 9 * (qt / deth)]); qt / deth = 1!
+
+    var bars = details.selectAll("g.bars")
+					  .data(arr)
+                      .enter().append("svg:g")
+					  .attr("class", "cldetails")
+					  .attr("transform", function (d) { return "translate(" + x(d["city"]) + ",0" + /*(deth - y(d[globalfirstVar])) + */")"; });
+//details should update to experiment choice!
+
+    bars.append("circle")
+        .attr("city", function (d) { return d.city; })
+        .attr("school", function (d) { return d.school; })
+        .attr("ph", function(d) { return d[globalfirstVar]; })
+        .attr("tph", function(d) { return d[globalsecondVar]; })
+        //.attr("r", function (d) { return rt(d[globalsecondVar]); })
+        .attr("r",4)
+        .style("fill", function (d) { return c(d[globalfirstVar]); })
+        .style("stroke", function (d) { return d3.rgb(c(d[globalfirstVar])).darker(); })
+        .attr("transform", function (d) { return "translate(0," + (deth - y(d[globalfirstVar])) + ")"; })
+        .on("mouseover", clover)
+        .on("mousemove", clmove)
+        .on("mouseout", clout);
+
+			
+    bars.append("circle")
+//        .attr("class", "hisrect")
+        .attr("r", 2)
+        .style("fill", function (d) { return d3.rgb(c(d[globalfirstVar])).darker(); })
+        .style("stroke", "none")
+        .attr("transform", function (d) { return "translate(0," + (deth - y(d[globalfirstVar])) + ")"; });
+
+    bars.append("text")
+	    .attr("class","cityname") //trying to align text to the right in the class doesn't work
+        .text(function (d) { return d["city"]; })
+		.attr("transform", "translate("+ 5 + "," +(120+ deth) + ")rotate(-90)")
+		
+		//.on("mouseover", Flashy)
+		//.on("mouseout", Flushy);
+
+			
+	function Flashy(d, i) {
+		d3.select(this)
+		  .transition()
+		  .duration(50)
+		  .style("fill", "black")
+		  .style("font-weight", "bold")
+		  .style("font-size", "12px");			
+	};					
+	
+	function Flushy(d, i) {
+		d3.select(this)
+		  .transition()
+		  .duration(500)
+		  .style("fill", "#222")
+		  .style("font-weight", "normal")
+		  .style("font-size", "8px");
+	};			
+			
+    detailsCircles = details.selectAll(".cldetails");
+
+	
+   d3.select("#details")
+     .on("click", function () {
+       
+		detailsCircles = null;
+
+ 	    d3.select("#details")
+		  .style('display', 'none');
+
+        //this is a lot of html within the code
+        d3.select("#theNumbers")
+          .html("<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" + reeks.length + "</span><br/><span class=\"statlabel\">average " + globalfirstVarlabel + ": </span><span class=\"stat\">" + gemfirstVar + "</span><br/><span class=\"statlabel\">average " + globalsecondVarlabel + ": </span><span class=\"stat\">" + gemsecondVar + "</span>")
+          .style("z-index", 10);
+
+        doHistogram(reeks);
+		
+        if (!isExists(selectedPath)) return;
+		
+        selectedPath.attr("fill", "#222");
+        
+		selectedPath = null;
+    });
+}
 
 d3.select("#experiments").on("change", updateDataset);
 
