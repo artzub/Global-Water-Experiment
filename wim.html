@@ -1,6 +1,6 @@
 <script type='text/javascript'
         src='http://www.visualizing.org/sites/all/modules/custom/seedge_sprint/libs/d3/d3.v2.min.js'></script>
-<!--<script type='text/javascript' src='../../D3/d3.v2.js'></script>-->
+<!--<script type='text/javascript' src='../../D3/d3.v2.min.js'></script>-->
 
 <style type="text/css">
 
@@ -60,7 +60,7 @@ line, .tikkies {
     color: white;
 }
 
-#header, #subheader, a:hover, #bijbakje, #chooseI, #chooseII, #chooseIII, #histolabel_x, #histolabel_y, .stat, .statlabel {
+#header, #subheader, a:hover, #bijbakje, #chooseI, #chooseII, #chooseIII, #histolabel_x, #histolabel_y, .stat, .statlabel, #details.astxt{
     text-shadow: .5px .5px 1px #000;
 }
 
@@ -229,10 +229,13 @@ div.tooltip {
 #details {
     position: absolute;
     top: 120px;
-    left: 280px;
+    left: 260px;
+	min-width: 360px;
+	max-width: 500px;
     background: #ccc;
     display: none;
     z-index: 9000;
+	overflow: auto;
     opacity: 1;
 }
 
@@ -248,20 +251,29 @@ div.tooltip {
     stroke-width: .3px;
 }
 
-#details .astxt, #details .bartxt {
-    font-size: 10px;
+#details .astxt {
+    font-size: 110%;
+    fill: #000;
+    font-weight: bold;
+}
+#details .astiktxt {
+    font-size: 8px;
     fill: #000;
     font-weight: bold;
 }
 
+#details .bartxt {
+	font-family: "Arial Narrow";
+    fill: #000;
+}
+
+
 #close {
     position: absolute;
-    left: 10px;
-    bottom: 10px;
+    right: 10px;
+    top: 10px;
     color: dimgrey;
     z-index: 9002;
-    font-size: 12px;
-    font-weight: bold;
 }
 /*
 #close:hover {
@@ -352,62 +364,67 @@ var activeDataset;
 
 //needed for radius consistency during zooms and for updates
 var reeks, globalData, globalfirstVar, globalsecondVar, globalfirstVarlabel, globalsecondVarlabel;
-var measurementCircles, detailsCircles = null;
+
+var measurementCircles, detailsCircles, highlightTimer = null;
+// timer to keep interaction responsive while highlighting measurement dots
 
 var margin = {top:0, right:0, bottom:0, left:0},
-        width = 1048 - margin.left - margin.right,
-        height = 560 - margin.top - margin.bottom;
+    width = 1048 - margin.left - margin.right,
+    height = 560 - margin.top - margin.bottom;
 
 
 var projection = d3.geo.mercator()
-        .scale(width)
-        .translate([width / 2.26, height / 1.6]);
+					   .scale(width)
+					   .translate([width / 2.26, height / 1.6]);
 
 
 var path = d3.geo.path()
-        .projection(projection);
+			 .projection(projection);
 
 var q = projection.scale();
 
 var zoom = d3.behavior.zoom()
-        .translate(projection.translate())
-        .scale(projection.scale())
-        .scaleExtent([height, 64 * height])
-        .on("zoom", move);
+			 .translate(projection.translate())
+			 .scale(projection.scale())
+			 .scaleExtent([height, 64 * height])
+			 .on("zoom", move);
 
 
 //prelimenary scaling stuff
 var lowColor,
-        midColor,
-        highColor;
+    midColor,
+    highColor;
 
 var r = d3.scale.linear();
 var c = d3.scale.linear();
 
-var highlightTimer = null;  // timer to keep interaction responsive while highlighting measurement dots
 
-d3.select("#experiments").property("value", "gwe_experiment1_v1");
+d3.select("#experiments")
+  .property("value", "gwe_experiment1_v1");
 
-d3.selectAll("#watertypes, #watersources").property("value", "");
+d3.selectAll("#watertypes, #watersources")
+  .property("value", "");
 
 
 /**
  *Draw map
  **/
 var svg = d3.select("#map")
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        .call(zoom);
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .call(zoom);
 
 
 var g = svg.append("g"),
-        feature = g.selectAll(".feature")
+    feature = g.selectAll(".feature") 
 
 
 svg.append("g").attr("id", "datapoints");
+
+svg.append("g").classed("hat",1).style("visibility","hidden");
 
 
 /**
@@ -417,27 +434,29 @@ var w = 100,
     h = 17;
 
 var bakje = d3.select("#schaalbakje")
-        .append("svg")
-        .attr("width", w)
-        .attr("height", h)
-        .append("svg:g");
+			  .append("svg")
+			  .attr("width", w)
+			  .attr("height", h)
+			  .append("svg:g");
 
 var gradient = bakje.append("svg:defs")
-        .append("svg:linearGradient")
-        .attr("id", "gradient")
-        .attr("x1", "0%")
-        .attr("y1", "0%")
-        .attr("x2", "100%")
-        .attr("y2", "0%")
-        .attr("spreadMethod", "pad");
+					.append("svg:linearGradient")
+					.attr("id", "gradient")
+					.attr("x1", "0%")
+					.attr("y1", "0%")
+					.attr("x2", "100%")
+					.attr("y2", "0%")
+					.attr("spreadMethod", "pad");
 
 		
 //pie scales and sizes
 var wpie = 50,
     hpie = 50,
     rpie = Math.min(wpie, hpie) / 2,
-    typecolor = d3.scale.ordinal().range(["deepskyblue", "aquamarine", "lightgrey"]),
-    sourcecolor = d3.scale.ordinal().range(["#7B86EF", "#6371ED", "#4E5EEA", "#283BE6", "#1A2DDA", "#1729C5", "#13219F", "#0D176D", "lightgrey"]);
+    typecolor = d3.scale.ordinal()
+						.range(["deepskyblue", "aquamarine", "lightgrey"]),
+    sourcecolor = d3.scale.ordinal()
+						  .range(["#7B86EF", "#6371ED", "#4E5EEA", "#283BE6", "#1A2DDA", "#1729C5", "#13219F", "#0D176D", "lightgrey"]);
 		
 		
 
@@ -446,64 +465,64 @@ var wpie = 50,
  **/
 
 var histw = 160,
-        histh = 160,
-        histpad = 60;
+    histh = 160,
+    histpad = 60;
 
 var his = d3.select("#histo")
-        .append("svg")
-        .attr("width", histw + histpad)
-        .attr("height", histh + histpad)
-        .append("svg:g")
-        .attr("transform", "translate(40,40)");
+			.append("svg")
+			.attr("width", histw + histpad)
+			.attr("height", histh + histpad)
+			.append("svg:g")
+			.attr("transform", "translate(40,40)");
 
 
-his.append("line")
-        .attr("x1", 0)
-        .attr("x2", histw)
-        .attr("y1", histh)
-        .attr("y2", histh)
-        .style("opacity", 1e-6)
+	his.append("line")
+	   .attr("x1", 0)
+	   .attr("x2", histw)
+       .attr("y1", histh)
+       .attr("y2", histh)
+       .style("opacity", 1e-6)
 
-        .transition()
-        .delay(4000)
-        .duration(250)
-        .style("opacity", 1);
+       .transition()
+       .delay(4000)
+       .duration(250)
+       .style("opacity", 1);
 
 
-his.append("line")
-        .attr("x1", 0)
-        .attr("x2", 0)
-        .attr("y1", 0)
-        .attr("y2", histh)
-        .style("opacity", 1e-6)
+	his.append("line")
+       .attr("x1", 0)
+       .attr("x2", 0)
+       .attr("y1", 0)
+       .attr("y2", histh)
+       .style("opacity", 1e-6)
 
-        .transition()
-        .delay(4000)
-        .duration(250)
-        .style("opacity", 1);
+	   .transition()
+       .delay(4000)
+       .duration(250)
+       .style("opacity", 1);
 
 
 d3.selectAll("#histolabel_y, #histolabel_x")
-        .transition()
-        .delay(4300)
-        .duration(250)
-        .style("opacity", 1);
+  .transition()
+  .delay(4300)
+  .duration(250)
+  .style("opacity", 1);
 
-
+  
 /**
  * setup country details
  */
 
-var cropw = 100,
-    croph = 40,
-    detw = width/1.6 - cropw / 2,
-    deth = height/2 - croph;
+var cropw = 50,
+    croph = 50,
+    detw = width / 1.55 - cropw / 5,
+    deth = height / 2 - croph / 3;
 
 var details = d3.select("#details")
-        .append("svg")
-        .attr("width", width/1.6)
-        .attr("height", height/2);
-
+				.append("svg")
+				.attr("width", width/1.5)
+				.attr("height", height/1.9);
+/*
 details.append("line")
         .attr("x1", cropw)
         .attr("x2", detw)
@@ -515,10 +534,10 @@ details.append("line")
 details.append("line")
         .attr("x1", cropw)
         .attr("x2", cropw)
-        .attr("y1", croph - 10)
+        .attr("y1", croph)
         .attr("y2", deth)
         .style("opacity", 1);
-
+*/
 
 /**
  *
@@ -526,13 +545,12 @@ details.append("line")
 
 var lastData = null;
 var maxt = 1,
-        mint = 0,
-        mt = 0;
+    mint = 0,
+    mt = 0;
 
 
-function isExists(obj) {
-    return typeof(obj) != 'undefined' && obj != null
-}
+function isExists(obj) { return typeof(obj) != 'undefined' && obj != null };
+
 
 var replaceCountry = {
   "Russian Federation":"Russia", "Tuninsia":"Tunisia", "United State of America":"United States of America", "United States":"United States of America", "USA":"United States of America", "US":"United States of America", /*"Georgia":"United States of America" // ???!!!,*/ "Hong Kong":"China", "UK":"United Kingdom", "uk":"United Kingdom", "Espana":"Spain", "SLOVAKIA":"Slovakia", "Slovakia":"Slovakia", "Slovensko":"Slovakia", "Turkiye":"Turkey", "turkey":"Turkey", "Serbia":"Republic of Serbia", "Bosna i Hercegovina":"Bosnia and Herzegovina", "Scotland":"United Kingdom"
@@ -577,362 +595,12 @@ function initMap(data) {
         if (!isExists(lastData[ccn]))
             lastData[ccn] = [];
 
-      if (globalfirstVar == "sanity"&&
-            d[globalsecondVar] >= 24)
-            continue;
+		if (globalfirstVar == "sanity" && d[globalsecondVar] >= 24) continue;
 
-        if (globalfirstVar == "dropsofbleach" &&
-            d[globalfirstVar] >= 799)
-            continue;
+        if (globalfirstVar == "dropsofbleach" && d[globalfirstVar] >= 799) continue;
 
         lastData[ccn].push(d);
     }
-}
-
-function getCountryTempr(coll, name) {
-
-    var watertype = d3.select("#watertypes").property("value");
-    var watersource = d3.select("#watersources").property("value");
-
-
-    var arr = [];
-
-    if (isExists(coll[name])) {
-        var cdata = coll[name];
-        for (var i in cdata) {
-            if ((watertype == "" || watertype == cdata[i].waterType) &&
-                    (watersource == "" || watersource == cdata[i].waterSource)) {
-                arr.push(cdata[i]);
-            }
-        }
-    }
-    return arr;
-}
-;
-
-function overpath(d) {
-    var cn = d.properties.name;
-    if (getCountryTempr(lastData, cn).length < 1)
-        return;
-
-    var item = d3.select(this);
-    item.transition()
-        .duration(250).attr('fill', '#666');
-    item.style("cursor", "pointer");
-    tooltipdiv
-            .html("<span class=\"statlabel\">" + cn + "</span>")
-            .style("background", "#ddd")
-//            .style("width", "auto")
-            .style("height", "auto")
-            .style("z-index", 100)
-            .transition()
-            .duration(250)
-            .style("opacity", 1);
-}
-
-function moverpath() {
-    tooltipdiv
-			//to bring in New Zealand
-                    .style("top", d3.event.pageY > height / 2 ? (d3.event.pageY - 32) + "px" : (d3.event.pageY + 12) + "px")
-                    .style("left", d3.event.pageX > width / 2 ? (d3.event.pageX - 60) + "px" : (d3.event.pageX + 12) + "px");
-}
-
-function outpath(d) {
-    var item = d3.select(this);
-    item.style("cursor", "default");
-    tooltipdiv
-            .transition()
-            .duration(250)
-            .style("opacity", 1e-6)
-            .style("z-index", -100)
-            .style("width", "200px")
-            .style("height", "90px");
-    item.transition()
-        .duration(250).attr('fill', '#222');
-}
-
-var selectedPath = null;
-
-function clover(d) {
-    var item = d3.select(this);
-    var city = item.attr("city");
-    var school = item.attr("school");
-    var ph = item.attr("ph");
-    var tph = item.attr("tph");
-    item.transition()
-        .duration(250).
-      style("fill", function() {
-        return d3.rgb(c(ph)).brighter();
-    });
-    tooltipdiv
-            .html('<span class="statlabel">School: </span><span  class="stat">' + school + '</span>' +
-            '<br /><span class="statlabel">City: </span><span  class="stat">' + city + '</span>' +
-            '<br /><span class="statlabel">' + globalfirstVarlabel + '</span><span  class="stat">' + ph + '</span>' +
-            '<br /><span class="statlabel">' + globalsecondVarlabel + '</span><span  class="stat">' + tph + '</span>' )
-            .style("background", function () {
-                return c(ph);
-            })
-//            .style("width", "auto")
-            .style("height", "auto")
-            .style("z-index", 9999)
-            .transition()
-            .duration(250)
-            .style("opacity", 1);
-}
-
-function clmove() {
-    tooltipdiv
-                    .style("top", d3.event.pageY + 16 + "px")
-                    .style("left", d3.event.pageX - 100 + "px");
-}
-
-function clout(d) {
-    var item = d3.select(this);
-    item.transition()
-      .duration(250)
-      .style("fill", function() {
-        return c(item.attr("ph"));
-    });
-    tooltipdiv
-            .transition()
-            .duration(250)
-            .style("opacity", 1e-6)
-            .style("z-index", -100)
-            .style("width", "200px")
-            .style("height", "90px");
-}
-
-function clickPath(d) {
-    var cn = d.properties.name;
-    var arr = getCountryTempr(lastData, cn);
-    if (arr.length < 1)
-        return;
-
-    var item = d3.select(this);
-    seletedPath = item;
-    item.attr('fill', '#FFFCCC');
-    d3.select("#histo")
-            .style("background", "#444")
-            .style("z-index", 9001);
-			
-			
-    doHistogram(arr.map(function (d) {
-        return d[globalfirstVar];
-    }));
-	
-	
-    var dc = d3.select("#details").style('display', 'block');
-//    d3.select("#close").on("click", function () {
-    d3.select("#details").on("click", function () {
-        detailsCircles = null;
-        d3.select("#details").style('display', 'none');
-        d3.select("#histo").style("background", "none");
-
-        //this is a lot of html within the code
-        d3.select("#theNumbers")
-                .html("<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" +
-                reeks.length + "</span><br/><br/><span class=\"statlabel\">average " +
-                globalfirstVarlabel + "</span><span class=\"stat\">" + gemfirstVar +
-                "</span><br/><span class=\"statlabel\">average " + globalsecondVarlabel +
-                "</span><span class=\"stat\">" + gemsecondVar + "</span>")
-                .style("z-index", 10);
-
-        doHistogram(reeks);
-        if (!isExists(selectedPath))
-            return;
-        selectedPath.attr("fill", "#222");
-        selectedPath = null;
-    });
-
-    //sourceofwater
-    //school
-
-    /*var nest = arr.nest()
-     .key(function(d) { return d["city"]; });*/
-
-    console.log(arr.map(function (d) {
-        return d.city;
-    }));
-
-    var x = d3.scale.ordinal()
-            .domain(arr.map(function (d) {
-        return d.city;
-    }))
-            .rangeBands([cropw + 20, detw - 20]);
-
-    var mf = d3.round(d3.mean(arr, function (d) {
-        return d[globalfirstVar];
-    }), 2),
-            mt = d3.round(d3.mean(arr, function (d) {
-                return d[globalsecondVar];
-            }), 2);
-    var minf = d3.min(arr, function (d) {
-        return d[globalfirstVar];
-    });
-    var maxf = d3.max(arr, function (d) {
-        return d[globalfirstVar];
-    });
-
-    var y = d3.scale.linear()
-            .domain([minf - mf / 4, maxf + mf / 4])
-            .range([0, deth - croph]);
-
-    //this is a lot of html within the code
-    d3.select("#theNumbers")
-            .html("<span class=\"statlabel\">Country: </span><span class=\"stat\">" +
-            cn + "</span><br />" +
-            "<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" +
-            arr.length + "</span><br/><br/><span class=\"statlabel\">average " +
-            globalfirstVarlabel + "</span><span class=\"stat\">" + mf +
-            "</span><br/><span class=\"statlabel\">average " + globalsecondVarlabel +
-            "</span><span class=\"stat\">" + mt + "</span>")
-            .style("z-index", 9003);
-			
-
-    details.selectAll("g").remove();
-
-    details.append("svg:g")
-            .style("opacity", 1)
-            .attr("transform", "translate(0," + (croph - 20) + ")")
-            .append("text")
-            .attr("class", "astxt")
-            .attr("x", cropw - 20)
-            .attr("dy", ".71em")
-            .attr("text-anchor", "middle")
-            .text("pH") //needs to update with choice of experiment!!!
-            .style("fill", "dimgrey");
-
-    details.append("svg:g")
-            .style("opacity", 1)
-            .attr("transform", "translate(" + (detw + 5) + "," + (deth + 5) + ")")
-            .append("text")
-            .attr("class", "astxt")
-            .attr("dy", ".71em")
-            .attr("text-anchor", "middle")
-            .text("cities")
-            .style("fill", "dimgrey");
-
-    var rules = details.selectAll("g.rule")
-            .data(y.ticks(10))
-            .enter()
-            .append("svg:g")
-            .style("opacity", 1)
-            .attr("transform", function (d) {
-                return "translate(0," + (deth - y(d)) + ")";
-            });
-
-
-    rules.append("line")
-            .attr("class", "tikkies")
-            .attr("x1", cropw - 1)
-            .attr("x2", cropw - 5);
-
-
-    rules.append("line")
-            .attr("class", "grid")
-            .attr("x1", cropw + 1)
-            .attr("x2", detw);
-
-
-    rules.append("text")
-            .attr("class", "astxt")
-            .attr("x", cropw - 18)
-            .attr("dy", ".71em")
-            .attr("text-anchor", "middle")
-            .attr("text-align", "left")
-            .text(y.tickFormat(10))
-            .style("display", function (d) {
-                return d == 0 ? "none" : null
-            });
-
-    rules.transition()
-            .delay(4000)
-            .duration(250)
-            .style("opacity", 1);
-
-    var qt = deth;
-
-    var rt = d3.scale.linear()
-            .domain(d3.extent(arr.map(function (d) {
-        return d[globalsecondVar];
-    })))
-            .range([3 * (qt / deth), 9 * (qt / deth)]);
-
-    var bars = details.selectAll("g.bars")
-            .data(arr)
-            .enter().append("svg:g").attr("class", "cldetails")
-            .attr("transform", function (d) {
-                return "translate(" + x(d["city"]) + ",0" + /*(deth - y(d[globalfirstVar])) + */")";
-            });
-//details should update to experiment choice!
-
-    bars.append("circle")
-            .attr("city", function (d) { return d.city; })
-            .attr("school", function (d) { return d.school; })
-            .attr("ph", function(d) { return d[globalfirstVar]; })
-            .attr("tph", function(d) { return d[globalsecondVar]; })
-            .attr("r", function (d) {
-                return rt(d[globalsecondVar]);
-            })
-            .style("fill", function (d) {
-                return c(d[globalfirstVar]);
-            })
-            .style("stroke", function (d) {
-                return d3.rgb(c(d[globalfirstVar])).darker();
-            })
-            .attr("transform", function (d) {
-                return "translate(0," + (deth - y(d[globalfirstVar])) + ")";
-            })
-            .on("mouseover", clover)
-            .on("mousemove", clmove)
-            .on("mouseout", clout);
-
-    bars.append("circle")
-        //.attr("class", "hisrect")
-            .attr("r", 2)
-            .style("fill", function (d) { return d3.rgb(c(d[globalfirstVar])).darker(); })
-            .style("stroke", "none")
-            .attr("transform", function (d) { return "translate(0," + (deth - y(d[globalfirstVar])) + ")"; });
-
-    bars.append("line")
-            .style("stroke", function (d) { return d3.rgb(c(d[globalfirstVar])).darker(); })
-        //.attr("x1", function(d) {return x(d["city"]); })
-        //.attr("x2", function(d) {return x(d["city"]); })
-            .style("opacity", 0.4)
-            .attr("y1", deth)
-            .attr("y2", function (d) { return (deth - y(d[globalfirstVar])); })
-		//	.on("mouseover", oplichten...  );
-
-    bars.append("text")
-            .style("fill", "dimgrey")//function (d) { return "#5D5DE9"; })
-            .style("writing-mode", "tb-rl")
-        //.style("glyph-orientation-vertical", 0)
-            .style("font-size", "11px")
-            .attr("y", function (d) { return deth - ((d["city"].length) * 11 / 2); })
-            .attr("x", 5)
-            .style("text-align", "right")
-            .text(function (d) { return d["city"]; })
-			.on("mouseover", Flashy)
-			.on("mouseout", Flushy);
-
-			
-function Flashy(d, i) {
-		d3.select(this)
-		  .style("fill", "red")
-		  .style("font-weight", "bold");
-		
-};					
-	
-
-function Flushy(d, i) {
-		d3.select(this)
-		  .style("fill", "dimgrey")
-		  .style("font-weight", "normal");
-		
-};			
-	
-			
-    detailsCircles = details.selectAll(".cldetails");
 }
 
 /**
@@ -942,19 +610,19 @@ function Flushy(d, i) {
 d3.json("/sites/default/files/sprint/data/world-countries.json", function (collection) {
 
     feature = feature
-            .data(collection.features)
-            .enter().append("path")
-            .attr("class", "feature")
-            .attr("d", path)
-            .attr('fill', '#222')
-            .on("mouseover", overpath)
-            .on("mousemove", moverpath)
-            .on("click", clickPath)
-            .on("mouseout", outpath);
-
+					 .data(collection.features)
+					 .enter().append("path")
+					 .attr("class", "feature")
+					 .attr("d", path)
+					 .attr('fill', '#222')
+					 .on("mouseover", overpath)
+					 .on("mousemove", moverpath)
+					 .on("click", clickPath)
+					 .on("mouseout", outpath);
+			 
     activeDataset = "gwe_experiment1_v1";
 
-    swap_to_Exp("red", "green", "blue", "pH ", "ph", "temperature (in \u00b0C): ", "temperature");
+    swap_to_Exp("red", "green", "blue", "pH", "ph", "temperature (in \u00b0C)", "temperature");
 });
 
 
@@ -969,13 +637,13 @@ function updateDataset() {
         activeDataset = picker;
 
     if (picker == "gwe_experiment1_v1") {
-        swap_to_Exp("red", "green", "blue", "pH ", "ph", "temperature (in \u00b0C): ", "temperature");
+        swap_to_Exp("red", "green", "blue", "pH", "ph", "temperature (in \u00b0C)", "temperature");
     }
 
     else
 
     if (picker == "gwe_experiment2_v1") {
-        swap_to_Exp("green", "greenyellow", "white", "salinity ", "sanity", "salinity by weight: ", "sanitybyweight");
+        swap_to_Exp("green", "greenyellow", "white", "salinity", "sanity", "salinity by weight", "sanitybyweight");
     }
 
     //please note: the dataset still speaks of sanity instead of salinity - this should be corrected!
@@ -990,7 +658,7 @@ function updateDataset() {
     else
 
     if (picker == "gwe_experiment3_v1") {
-        swap_to_Exp("green", "orange", "red", "drops of bleach ", "dropsofbleach", "temperature (in \u00b0C): ", "temperature");
+        swap_to_Exp("green", "orange", "red", "drops of bleach", "dropsofbleach", "temperature (in \u00b0C)", "temperature");
     }
 
     //what is up with this school? 799 dropsofbleach?!
@@ -999,6 +667,9 @@ function updateDataset() {
 
 
     //the still efficiency dataset only has one variable that has to be plotted - how can this be made to fit the experiment changer routine?
+	//actually the still experiment is somewhat different from the other three, which are all related to water quality
+	
+	//another actually: actually the three 'experiments' are not experiments, they are measurements
 
     //	else
     //	if (picker == "gwe_experiment4_v1") { swap_to_Exp(); }
@@ -1014,6 +685,8 @@ function swap_to_Exp(lowColor, midColor, highColor, firstVarlabel, firstVar, sec
     globalfirstVarlabel = firstVarlabel;
     globalsecondVarlabel = secondVarlabel;
 
+	
+    svg.select(".hat").selectAll("*").remove();
 
     /**
      * Load data from JSON and draw visualization
@@ -1027,50 +700,30 @@ d3.json("/sites/default/files/sprint/data/" + activeDataset + ".json", function 
          */
 
         initMap(data);
-
-        if (firstVar == "sanity") {
-            //filter out two specific data entry errors
-            data = data.filter(function (d) {
-                return d[secondVar] < 24;
-            });
+//filter out two specific data entry errors
+        if (firstVar == "sanity") { data = data.filter(function (d) { return d[secondVar] < 24; });
         }
-
-        if (firstVar == "dropsofbleach") {
-            //filter out one unlikely outlier
-            data = data.filter(function (d) {
-                return d[firstVar] < 799;
-            });
-        }
+//filter out one unlikely outlier
+        if (firstVar == "dropsofbleach") { data = data.filter(function (d) { return d[firstVar] < 799; }); }
 
         globalData = data;
 
-        gemfirstVar = d3.round(d3.mean(data, function (d) {
-            return d[firstVar];
-        }), 2);
-        gemsecondVar = d3.round(d3.mean(data, function (d) {
-            return d[secondVar];
-        }), 2);
+        gemfirstVar = d3.round(d3.mean(data, function (d) { return d[firstVar]; }), 2);
+        gemsecondVar = d3.round(d3.mean(data, function (d) { return d[secondVar]; }), 2);
 
-        reeks = data.map(function (d) {
-            return d[firstVar];
-        });
+        reeks = data.map(function (d) { return d[firstVar]; });
 
         // scale for temperature to radius
-        r.domain(d3.extent(data.map(function (d) {
-            return d[secondVar];
-        })))
-                .range([1 * (q / width), 6 * (q / width)]);
+        r.domain(d3.extent(data.map(function (d) { return d[secondVar]; })))
+         .range([1 * (q / width), 6 * (q / width)]);
 
 
         // scale for ph to color
-        //c.domain(d3.extent(data.map(function(d) { return d[firstVar]; })))
+        //c.domain(d3.extent(data.map(function(d) { return d[firstVar]; }))) //??
         //c.domain([5, d3.max(data, function(d) { return d[firstVar]; })]) // using a manually-set low value because an extreme sample is distorting the range
-        c.domain([d3.min(data, function (d) {
-            return d[firstVar];
-        }), gemfirstVar, d3.max(data, function (d) {
-            return d[firstVar];
-        })])// using a manually-set low value because an extreme sample is distorting the range
-                .range([lowColor, midColor, highColor]);
+        c.domain([d3.min(data, function (d) { return d[firstVar]; }), gemfirstVar, d3.max(data, function (d) { return d[firstVar];
+        })])
+         .range([lowColor, midColor, highColor]);
 
 				
 //gather data for pies 
@@ -1094,9 +747,9 @@ sources.push({ "source": "waste water", "size": data.filter(function(d) { return
 sources.push({ "source": "unknown", "size": data.filter(function(d) { return d.waterSource == "unknown"; }).length });
 
 
-donut = d3.layout.pie().sort(null).value(function(d) {
-										 return d.size;
-										});	
+donut = d3.layout.pie()
+		  .sort(null)
+		  .value(function(d) { return d.size; });	
 
 arc = d3.svg.arc().outerRadius(rpie);
  
@@ -1108,7 +761,8 @@ arc = d3.svg.arc().outerRadius(rpie);
         /**
          *Gradient legend for pH values / needs tickmarks
          **/
-        gradient.selectAll("stop").remove();
+        gradient.selectAll("stop")
+				.remove();
 
 
         gradient.append("svg:stop")
@@ -1127,13 +781,14 @@ arc = d3.svg.arc().outerRadius(rpie);
                 .attr("stop-opacity", 1);
 
         bakje.append("rect")
-                .attr("width", w)
-                .attr("height", h)
-                .attr("rx", "4px")
-                .attr("ry", "4px")
-                .style("fill", "url(#gradient)");
+             .attr("width", w)
+             .attr("height", h)
+             .attr("rx", "4px")
+             .attr("ry", "4px")
+             .style("fill", "url(#gradient)");
 
-        d3.select("#bijbakje").text(firstVarlabel);
+        d3.select("#bijbakje")
+		  .text(firstVarlabel);
 
         /* attempt at adding an axis to the legend
          bakas = d3.svg.axis()
@@ -1153,10 +808,10 @@ arc = d3.svg.arc().outerRadius(rpie);
 
 
         d3.selectAll("#choosers, #schaalbakje, #bijbakje, #pieHole")
-                .transition()
-                .delay(50)
-                .duration(250)
-                .style("opacity", 1);
+          .transition()
+          .delay(50)
+          .duration(250)
+          .style("opacity", 1);
 				
 
 				
@@ -1164,10 +819,11 @@ arc = d3.svg.arc().outerRadius(rpie);
 
 //the pies could replace the current drop downs for waterType and waterSource
 			
-	d3.selectAll("#pieI, #pieII").select("svg").remove();
+	d3.selectAll("#pieI, #pieII").select("svg")
+								 .remove();
 					
 			
-	var visI = d3.select("#pieI")
+var visI = d3.select("#pieI")
 			 .append("svg")
 			 .data([types])
 			 .attr("width", wpie)
@@ -1181,10 +837,11 @@ var arcsI = visI.selectAll("g.arc")
 			
 	arcsI.append("path")
 		 .attr("fill", function(d, i) { return typecolor(i); })
+		 .attr("stroke", function(d, i) { return d3.rgb(typecolor(i)).darker(); })
 		 .attr("d", arc);
 	
 	arcsI.append("title")
-		 .text(function(d) { return d.data.type + ": " + d.data.size;; })	
+		 .text(function(d) { return d.data.type + ": " + d.data.size; })	
 
 
 	
@@ -1203,77 +860,77 @@ var arcsII = visII.selectAll("g.arc")
 
 	arcsII.append("path")
 		  .attr("fill", function(d, i) { return sourcecolor(i); })
-		  .attr("stroke", function(d, i) { return d3.rgb(sourcecolor(i)).darker; })
+		  .attr("stroke", function(d, i) { return d3.rgb(sourcecolor(i)).darker(); })
 		  .attr("d", arc);
 	
 	arcsII.append("title")
-		  .text(function(d) { return d.data.source + ": " + d.data.size;; });	
+		  .text(function(d) { return d.data.source + ": " + d.data.size; });	
 		
 			
-			
-		
+
 
 
         // refill circles
-        svg.select("#datapoints").selectAll("circle").transition().duration(1000).remove();
+    svg.select("#datapoints").selectAll("circle")
+							 .transition()
+							 .duration(1000)
+							 .remove();
 
 
-        svg.select("#datapoints").selectAll("circle.node")
-                .data(data)
-                .enter().append("circle")
-                .attr('class', 'measurementCircle')
-                .attr("transform", function (d) {
-                    return "translate(" + projection(d.coordinates) + ")";
-                })
-                .attr("r", 0)
-                .attr("fill", "#aaa")
-                .on("mouseover", tooltipper)
-                .on("mousemove", toolmover)
-                .on("mouseout", tooltapper)
-                .on("click", ripple)
-                .attr("visibility", "visible")/*function(d) {
+    svg.select("#datapoints").selectAll("circle.node")
+						     .data(data)
+						     .enter().append("circle")
+						     .attr('class', 'measurementCircle')
+						     .attr("transform", function (d) { return "translate(" + projection(d.coordinates) + ")"; })
+						     .attr("r", 0)
+						     .attr("fill", "#aaa")
+						     .on("mouseover", tooltipper)
+						     .on("mousemove", toolmover)
+						     .on("mouseout", tooltapper)
+						     .on("click", ripple)
+						     .attr("visibility", "visible")/*function(d) {
          var watertype = d3.select("#watertypes").property("value");
          var watersource = d3.select("#watersources").property("value");
          return (watertype == "" || watertype == d.waterType) && (watersource == "" || watersource == d.waterSource) ? "visible" : "hidden";
          })*/
 
-
                 .transition()
                 .delay(100)
                 .duration(1000)
-                .attr("r", function (d) {
-                    return r(d[secondVar]);
-                })
+                .attr("fill", function (d) { return c(d[firstVar]); })
+                .attr("stroke", function (d) { return d3.rgb(c(d[firstVar])).darker(); })
+
 
                 .transition()
                 .delay(1200)
                 .duration(1250)
+                .attr("r", function (d) { return r(d[secondVar]); })
             /*			.attr("fill", function(d) {
              if (d.ph < 6.5) return "steelblue";
              else if (d.ph > 8) return "firebrick";
              else return "#aaa"})
              */
-                .attr("fill", function (d) {
-                    return c(d[firstVar]);
-                })
-                .attr("stroke", function (d) {
-                    return d3.rgb(c(d[firstVar])).darker();
-                })
-
+				
+			
+		data.forEach(function(d,i) { sombrero(d,r(d[secondVar])); })
+				
+		
+		
         measurementCircles = svg.select('#datapoints').selectAll('.measurementCircle');
 
+		
         d3.selectAll("#watertypes , #watersources")
-                .property("value", "");
+          .property("value", "");
 
 
         tooltipdiv = d3.select("body")
-                .append("div")
-                .attr("class", "tooltip");
+					   .append("div")
+					   .attr("class", "tooltip");
 
 
         //this is a lot of html within the code
         d3.select("#theNumbers")
-                .html("<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" + reeks.length + "</span><br/><br/><span class=\"statlabel\">average " + firstVarlabel + "</span><span class=\"stat\">" + gemfirstVar + "</span><br/><span class=\"statlabel\">average " + secondVarlabel + "</span><span class=\"stat\">" + gemsecondVar + "</span>");
+          .html("<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" + reeks.length + "</span><br/><br/><span class=\"statlabel\">average " + firstVarlabel + ": </span><span class=\"stat\">" + gemfirstVar + "</span><br/><span class=\"statlabel\">average " + secondVarlabel + ": </span><span class=\"stat\">" + gemsecondVar + "</span>");
 
 
         //This is quite a lot of html code inside the d3 code - isn't there a better way to do this?
@@ -1283,26 +940,21 @@ var arcsII = visII.selectAll("g.arc")
         function tooltipper(d) {
             tooltipdiv
                 //	.style("height", "40px")
-                    .html("<span class=\"statlabel\">" + firstVarlabel + "</span><span class=\"stat\">" + d[firstVar] + "</span><br/><span class=\"statlabel\">" + secondVarlabel + "</span><span class=\"stat\">" + d[secondVar] + "</span><br/><span class=\"stat\">" + d.waterType + "</span><span class=\"statlabel\"> water</span><br/><span class=\"statlabel\">source: </span><span class=\"stat\">" + d.waterSource + "</span><br/><br/><span class=\"schoollabel\">(" + d.school + ", " + d.country + ")</span>")
+                    .html("<span class=\"statlabel\">" + firstVarlabel + ": </span><span class=\"stat\">" + d[firstVar] + "</span><br/><span class=\"statlabel\">" + secondVarlabel + ": </span><span class=\"stat\">" + d[secondVar] + "</span><br/><span class=\"stat\">" + d.waterType + "</span><span class=\"statlabel\"> water</span><br/><span class=\"statlabel\">source: </span><span class=\"stat\">" + d.waterSource + "</span><br/><br/><span class=\"schoollabel\">(" + d.school + ", " + d.country + ")</span>")
                     .style("background", c(d[firstVar]))
+					.style("width", "200px")
                     .style("z-index", 100)
 
                     .transition()
                     .duration(250)
                     .style("opacity", 1);
-        }
-
-        ;
-
+        };
 
         function toolmover() {
             tooltipdiv
                     .style("top", d3.event.pageY > height / 2 ? (d3.event.pageY - 102) + "px" : (d3.event.pageY + 12) + "px")
                     .style("left", d3.event.pageX > width / 2 ? (d3.event.pageX - 212) + "px" : (d3.event.pageX + 12) + "px");
-        }
-
-        ;
-
+        };
 
         function tooltapper() {
             tooltipdiv
@@ -1310,14 +962,10 @@ var arcsII = visII.selectAll("g.arc")
                     .duration(250)
                     .style("opacity", 1e-6)
                     .style("z-index", -100);
-        }
-
-        ;
-
-
+        };
     });
-}
-;
+};
+
 
 
 function doHistogram(reeks) {
@@ -1328,116 +976,96 @@ function doHistogram(reeks) {
         reeks = window.reeks;
 
     d3.selectAll(".grid, .tikkies, .hisrect, text")
-            .transition()
-            .duration(500)
-            .style("opacity", 1e-6)
-            .remove(); //.transition().duration(1000)
+      .transition()
+      .duration(500)
+      .style("opacity", 1e-6)
+      .remove(); //.transition().duration(1000)
 
 
     var histogram = d3.layout.histogram()(reeks);
 
     var x = d3.scale.ordinal()
-            .domain(histogram.map(function (d) {
-        return d.x;
-    }))
-            .rangeBands([0, histw]);
+              .domain(histogram.map(function (d) { return d.x; }))
+              .rangeBands([0, histw]);
 
     var y = d3.scale.linear()
-            .domain([0, d3.max(histogram, function (d) {
-        return d.y;
-    })])
-            .range([0, histh]);
+              .domain([0, d3.max(histogram, function (d) { return d.y; })])
+              .range([0, histh]);
 
     var rules = his.selectAll("g.rule")
-            .data(y.ticks(10))
-            .enter()
-            .append("svg:g")
-            .style("opacity", 1e-6)
-            .attr("transform", function (d) {
-                return "translate(0," + (histh - y(d)) + ")";
-            });
+				   .data(y.ticks(10))
+				   .enter()
+				   .append("svg:g")
+				   .style("opacity", 1e-6)
+				   .attr("transform", function (d) { return "translate(0," + (histh - y(d)) + ")"; });
 
 
     rules.append("line")
-            .attr("class", "tikkies")
-            .attr("x1", -1)
-            .attr("x2", -5);
+         .attr("class", "tikkies")
+         .attr("x1", -1)
+         .attr("x2", -5);
 
 
     rules.append("line")
-            .attr("class", "grid")
-            .attr("x1", 1)
-            .attr("x2", histw);
+         .attr("class", "grid")
+         .attr("x1", 1)
+         .attr("x2", histw);
 
 
     rules.append("text")
-            .attr("class", "astxt")
-            .attr("x", -15)
-            .attr("dy", ".71em")
-            .attr("text-anchor", "middle")
-            .text(y.tickFormat(10))
-            .style("display", function (d) {
-                return d == 0 ? "none" : null
-            });
+         .attr("class", "astxt")
+         .attr("x", -15)
+         .attr("dy", ".71em")
+         .attr("text-anchor", "middle")
+         .text(y.tickFormat(10))
+         .style("display", function (d) { return d == 0 ? "none" : null });
 
+		 
     rules.transition()
-            .delay(4000)
-            .duration(250)
-            .style("opacity", 1);
+         .delay(4000)
+         .duration(250)
+         .style("opacity", 1);
 
 
     var bars = his.selectAll("g.bars")
-            .data(histogram)
-            .enter().append("svg:g")
-            .attr('class', 'histoBar')
-            .attr('id', function (d, i) {
-                return 'histoBar-' + i;
-            })
-            .attr("transform", function (d) {
-                return "translate(" + x(d.x) + "," + (histh - y(d.y)) + ")";
-            })
-            .on('mouseover', markHistogramBar)
-            .on('mouseout', unmarkHistogramBar);
+                  .data(histogram)
+                  .enter().append("svg:g")
+                  .attr('class', 'histoBar')
+                  .attr('id', function (d, i) { return 'histoBar-' + i; })
+                  .attr("transform", function (d) { return "translate(" + x(d.x) + "," + (histh - y(d.y)) + ")"; })
+                  .on('mouseover', markHistogramBar)
+                  .on('mouseout', unmarkHistogramBar);
 
 
     bars.append("rect")
-            .attr("class", "hisrect")
-            .attr("width", x.rangeBand())
-            .attr("y", function (d) {
-                return y(d.y);
-            })
-            .attr("height", 0)
-            .style("fill", function (d) {
-                return c(d.x);
-            })
-            .style("stroke", function (d) {
-                return d3.rgb(c(d.x)).darker();
-            })
+        .attr("class", "hisrect")
+        .attr("width", x.rangeBand())
+        .attr("y", function (d) { return y(d.y); })
+        .attr("height", 0)
+        .style("fill", function (d) { return c(d.x); })
+        .style("stroke", function (d) { return d3.rgb(c(d.x)).darker(); })
 
-            .transition()
-            .delay(2450)
-            .duration(750)
-            .attr("y", 0)
-            .attr("height", function (d) {
-                return y(d.y);
-            });
+        .transition()
+        .delay(2450)
+        .duration(750)
+        .attr("y", 0)
+        .attr("height", function (d) { return y(d.y); });
 
+		
     bars.append("text")
-            .attr("class", "bartxt")
-            .attr("x", x.rangeBand() / 2)
-            .attr("y", 0)
-            .attr("dy", "-.35em")
-        //	  .attr("dx", ".30em")
-            .attr("text-anchor", "middle")
-            .text(function (d) {
-                return d3.round(d.x, 1)
-            })
-            .style("opacity", 1e-6)
+        .attr("class", "bartxt")
+        .attr("x", x.rangeBand() / 2)
+        .attr("y", 0)
+        .attr("dy", "-.35em")
+//         .attr("dx", ".30em")
+        .attr("text-anchor", "middle")
+        .text(function (d) { return d3.round(d.x, 1) })
+        .style("opacity", 1e-6)
 
-            .transition()
-            .delay(3250)
-            .duration(750)
-            .style("opacity", 1);
+        .transition()
+        .delay(3250)
+        .duration(750)
+        .style("opacity", 1);
 
 
 }
@@ -1447,11 +1075,11 @@ function markHistogramBar(d, i) {
 
     // make all bars, except the hovered bar, semi transparent
     var selectedBarId = 'histoBar-' + i;
-    his.selectAll('.histoBar').transition()
-            .duration(300)
-            .style('opacity', function (d, i) {
-                return ( d3.select(this).attr('id') != selectedBarId ) ? 0.3 : 1
-            });
+
+    his.selectAll('.histoBar')
+	   .transition()
+       .duration(300)
+       .style('opacity', function (d, i) { return ( d3.select(this).attr('id') != selectedBarId ) ? 0.3 : 1; });
 
     highlightMeasurements(globalfirstVar, d.x, d.x + d.dx);
 
@@ -1460,9 +1088,10 @@ function markHistogramBar(d, i) {
 function unmarkHistogramBar(d, i) {
 
     // remove transparency from all bars
-    his.selectAll('.histoBar').transition()
-            .duration(300)
-            .style('opacity', 1);
+    his.selectAll('.histoBar')
+	   .transition()
+       .duration(300)
+	   .style('opacity', 1);
 
     highlightMeasurements(null);
 
@@ -1474,8 +1103,10 @@ function highlightMeasurements(metric, lowerBound, upperBound) {
         clearTimeout(highlightTimer);
     }
 
-    var watertype = d3.select("#watertypes").property("value");
-    var watersource = d3.select("#watersources").property("value");
+    var watertype = d3.select("#watertypes")
+	                  .property("value");
+    var watersource = d3.select("#watersources")
+	                  .property("value");
 
     highlightTimer = setTimeout(function () {
         var needObj = measurementCircles;
@@ -1515,7 +1146,7 @@ function updateVisibility() {
     var watersource = d3.select("#watersources").property("value");
 
     d3.selectAll("circle")
-            .attr("visibility", function (d) {
+      .attr("visibility", function (d) {
                 return (watertype == "" || watertype == d.waterType) && (watersource == "" || watersource == d.waterSource) ? "visible" : "hidden";
             });
 
@@ -1528,18 +1159,12 @@ function updateVisibility() {
     })
 
 
-    gemfirstVar = d3.round(d3.mean(filteredData, function (d) {
-        return d[globalfirstVar];
-    }), 2);
-    gemsecondVar = d3.round(d3.mean(filteredData, function (d) {
-        return d[globalsecondVar];
-    }), 2);
+    gemfirstVar = d3.round(d3.mean(filteredData, function (d) { return d[globalfirstVar]; }), 2);
+    gemsecondVar = d3.round(d3.mean(filteredData, function (d) { return d[globalsecondVar]; }), 2);
 
 
     //for histogram & stats
-    reeks = filteredData.map(function (d) {
-        return d[globalfirstVar];
-    });
+    reeks = filteredData.map(function (d) { return d[globalfirstVar]; });
 
     doHistogram();
 
@@ -1548,15 +1173,13 @@ function updateVisibility() {
     if (reeks.length == 0) {
         gemfirstVar = 0;
         gemsecondVar = 0;
-    }
-    ;
+    };
 
     d3.select("#theNumbers")
-            .html("<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" + reeks.length + "</span><br/><br/><span class=\"statlabel\">average " + globalfirstVarlabel + "</span><span class=\"stat\">" + gemfirstVar + "</span><br/><span class=\"statlabel\">average " + globalsecondVarlabel + "</span><span class=\"stat\">" + gemsecondVar + "</span>");
+            .html("<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" + reeks.length + "</span><br/><br/><span class=\"statlabel\">average " + globalfirstVarlabel + ": </span><span class=\"stat\">" + gemfirstVar + "</span><br/><span class=\"statlabel\">average " + globalsecondVarlabel + ": </span><span class=\"stat\">" + gemsecondVar + "</span>");
 
 
-}
-;
+};
 
 
 /**
@@ -1564,69 +1187,533 @@ function updateVisibility() {
  **/
 function move() {
     projection.translate(d3.event.translate).scale(d3.event.scale);
-    feature.attr("d", path);
-    d3.selectAll("circle")
-            .attr("transform", function (d) {
-                return "translate(" + projection(d.coordinates) + ")"
-            })
 
+    feature.attr("d", path);
+ 
+	d3.selectAll("circle")
+      .attr("transform", function (d) { return "translate(" + projection(d.coordinates) + ")"; })
 
     //Adapt the size of the circles to de scale of the map so they don't get too small
     q = projection.scale() / 3;
+	
+	
     r.range([1 * (q / width), 6 * (q / width)]);
 
+	
     d3.select("#datapoints").selectAll("circle")
-            .attr("r", function (d) {
-                return r(d[globalsecondVar]);
-            })
+							.attr("r", function (d) { return r(d[globalsecondVar]); })
 
-}
-;
+};
 
 
 //rippler - makes rings around the circles; nicked from Jerome Cukier's version 14
 function ripple(d) {
     svg.append("circle")
-            .attr("transform", function () {
-                return ("translate(" + projection(d.coordinates) + ")");
-            })
-            .attr("r", 200)
-            .style("stroke", "deepskyblue")
-            .style("stroke-opacity", .7)
-            .style("stroke-width", 2)
-            .style("fill", "none")
+       .attr("transform", function () { return ("translate(" + projection(d.coordinates) + ")"); })
+       .attr("r", 200)
+       .style("stroke", "deepskyblue")
+       .style("stroke-opacity", .7)
+       .style("stroke-width", 2)
+       .style("fill", "none")
 
-            .transition()
-            .delay(250)
-            .duration(250)
-            .attr("r", 100)
+       .transition()
+       .delay(250)
+       .duration(250)
+       .attr("r", 100)
 
-            .transition()
-            .delay(500)
-            .duration(250)
-            .attr("r", 50)
+       .transition()
+       .delay(500)
+       .duration(250)
+       .attr("r", 50)
 
-            .transition()
-            .delay(750)
-            .duration(250)
-            .attr("r", 25)
+       .transition()
+       .delay(750)
+       .duration(250)
+       .attr("r", 25)
 
-            .transition()
-            .delay(1000)
-            .duration(250)
-            .attr("r", 12)
+       .transition()
+       .delay(1000)
+       .duration(250)
+       .attr("r", 12)
 
         //.style("stroke-opacity","1").style("opacity",.2)
-            .each("end", function () {
-                d3.select(this).remove();
-            })
+       .each("end", function () { d3.select(this).remove(); })
+};
+
+
+function getCountryTempr(coll, name) {
+
+    var watertype = d3.select("#watertypes")
+					  .property("value");
+					  
+    var watersource = d3.select("#watersources")
+						.property("value");
+
+
+    var arr = [];
+
+    if (isExists(coll[name])) {
+	
+        var cdata = coll[name];
+        for (var i in cdata) {
+            if ((watertype == "" || watertype == cdata[i].waterType) && (watersource == "" || watersource == cdata[i].waterSource)) { arr.push(cdata[i]); }
+        }
+    }
+    return arr;
+};
+
+
+function overpath(d) {
+
+    var cn = d.properties.name;
+    if (getCountryTempr(lastData, cn).length < 1)
+        return;
+
+    var item = d3.select(this);
+	
+	item.transition()
+		.duration(250)
+		.attr('fill', '#666');
+		
+	item.style("cursor", "pointer");
+   
+	tooltipdiv
+            .html("<span class=\"statlabel\">" + cn + "</span>")
+            .style("background", "#ddd")
+            .style("width", "auto")
+            .style("height", "auto")
+            .style("z-index", 100)
+            .transition()
+            .duration(250)
+            .style("opacity", 1);
+};
+
+function moverpath() {
+
+    tooltipdiv
+			//to bring in New Zealand
+                    .style("top", d3.event.pageY > height / 2 ? (d3.event.pageY - 32) + "px" : (d3.event.pageY + 12) + "px")
+                    .style("left", d3.event.pageX > width / 2 ? (d3.event.pageX - 60) + "px" : (d3.event.pageX + 12) + "px");
+};
+
+function outpath(d) {
+    var item = d3.select(this);
+
+    item.style("cursor", "default");
+
+    tooltipdiv
+            .transition()
+            .duration(250)
+  //          .style("width", "200px")
+   //         .style("height", "90px");
+            .style("z-index", -100)
+            .style("opacity", 1e-6)
+
+	item.transition()
+        .duration(250).attr('fill', '#222');
 }
-;
+
+var selectedPath = null;
 
 
-d3.select("#experiments").on("change", updateDataset);
+function clover(d) {
 
-d3.selectAll("#watertypes, #watersources").on("change", updateVisibility);
+    var item = d3.select(this);
+    var city = item.attr("city");
+    var school = item.attr("school");
+    var ph = item.attr("ph");
+    var tph = item.attr("tph");
+	
+    item.transition()
+        .duration(250)
+		.style("fill", function() { return d3.rgb(c(ph)).brighter(); });
+	  
+    tooltipdiv
+            .html('<span class="statlabel">school: </span><span  class="stat">' + school + '</span>' +
+            '<br /><span class="statlabel">city: </span><span  class="stat">' + city + '</span>' +
+            '<br /><span class="statlabel">' + globalfirstVarlabel + ': </span><span  class="stat">' + ph + '</span>' +
+            '<br /><span class="statlabel">' + globalsecondVarlabel + ': </span><span  class="stat">' + tph + '</span>' )
+            .style("background", function () { return c(ph); })
+//            .style("width", "auto")
+            .style("height", "auto")
+            .style("z-index", 9999)
+			
+            .transition()
+            .duration(250)
+            .style("opacity", 1);
+}
+
+function clmove() {
+  
+	tooltipdiv
+            .style("top", d3.event.pageY + 16 + "px")
+            .style("left", d3.event.pageX - 100 + "px");
+}
+
+function clout(d) {
+
+    var item = d3.select(this);
+
+    item.transition()
+        .duration(250)
+        .style("fill", function() { return c(item.attr("ph")); });
+		
+    tooltipdiv
+        .transition()
+        .duration(250)
+        .style("opacity", 1e-6)
+        .style("z-index", -100)
+        .style("width", "200px")
+        .style("height", "90px");
+}
+
+function clickPath(d) {
+
+    var cn = d.properties.name;
+
+    var arr = getCountryTempr(lastData, cn);
+
+    if (arr.length < 1) return;
+
+    var item = d3.select(this);
+	
+    seletedPath = item;
+    
+	item.attr('fill', '#FFFCCC');
+    
+	d3.select("#histo")
+ 	  .style("background", "#444")
+      .style("z-index", 9001);
+			
+			
+    doHistogram(arr.map(function (d) { return d[globalfirstVar]; }));
+	
+	
+    var dc = d3.select("#details")
+	           .style('display', 'block');
+
+//    d3.select("#close").on("click", function () {
+   
+
+// gives an array of unique city names
+	 var arrNames = d3.keys(d3.nest()
+					          .key(function(d) { return d.city; })
+							  .map(arr)); 	  
+	  
+// gives an array of all data nested under the city names
+	var arrTot = d3.nest()
+				   .key(function(d) { return d.city; })
+				   .map(arr); 	  
+
+	var arrNamesLang = arrNames.length;
+
+	
+   console.log(arrTot);
+//	console.log(arr.length); 
+//    console.log(arr.map(function (d) { return d.city; }));
+
+	detw = 180 + arr.length * 4;
+	
+	details.attr("width", detw + 30);
+	
+	
+    var mf = d3.round(d3.mean(arr, function (d) { return d[globalfirstVar]; }), 2),
+        mt = d3.round(d3.mean(arr, function (d) { return d[globalsecondVar]; }), 2); 
+		
+    var minf = d3.min(arr, function (d) { return d[globalfirstVar]; });
+	
+    var maxf = d3.max(arr, function (d) { return d[globalfirstVar]; });
+	
+    var x = d3.scale.ordinal()
+				    .domain(arr.map(function (d) { return d.city; }))
+					.rangeBands([cropw + 8, detw]);
+
+    var y = d3.scale.linear()
+					.domain([2, 10])//([minf - mf / 4, maxf + mf / 4])
+					.range([0, deth - croph]);
+
+			  
+    //this is a lot of html within the code
+    d3.select("#theNumbers")
+      .html("<span class=\"statlabel\">country: </span><span class=\"stat\">" + cn + "</span><br />" + "<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" + arr.length + "</span><br/><br/><span class=\"statlabel\">average " + globalfirstVarlabel + ": </span><span class=\"stat\">" + mf + "</span><br/><span class=\"statlabel\">average " + globalsecondVarlabel + ": </span><span class=\"stat\">" + mt + "</span>")
+      .style("z-index", 9003);
+			
+
+    details.selectAll("g").remove();
+
+    details.append("svg:g")
+           .attr("transform", "translate(" + (cropw - 20) + "," + (croph - 16) + ")")
+           .append("text")
+           .attr("class", "astxt")
+   //       .attr("x", cropw)
+  //        .attr("dy", ".71em")
+  //        .attr("text-anchor", "middle")
+           .text(globalfirstVarlabel)//"pH") //needs to update with choice of experiment!!!
+  //        .style("opacity", 1)
+ //         .style("fill", "dimgrey");
+
+    details.append("svg:g")
+           .attr("transform", "translate(" + (detw - 34) + "," + (deth + 18) + ")")
+           .append("text")
+           .attr("class", "astxt")
+  //        .attr("dy", ".71em")
+  //        .attr("text-anchor", "middle")
+           .text("cities")
+ //         .style("opacity", 1)
+//          .style("fill", "dimgrey");
+
+    var rules = details.selectAll("g.rule")
+					   .data(y.ticks(10))
+					   .enter()
+					   .append("svg:g")
+ //         		     .style("opacity", 1)
+					   .attr("transform", function (d) { return "translate(0," + (deth - y(d)) + ")"; });
+
+/*
+    rules.append("line")
+            .attr("class", "tikkies")
+            .attr("x1", cropw - 1)
+            .attr("x2", cropw - 5);
+*/
+
+    rules.append("line")
+         .attr("class", "grid")
+         .attr("x1", cropw)
+         .attr("x2", detw);
 
 
+    rules.append("text")
+         .attr("class", "astiktxt")
+         .attr("x", cropw - 18)
+         .attr("dy", ".4em")
+//         .attr("text-anchor", "middle")
+		 .attr("text-align", "right")
+		 .text(y.tickFormat(10))
+         .style("display", function (d) { return d == 0 ? "none" : null });
+
+/*		 
+    rules.transition()
+         .delay(4000)
+         .duration(250)
+         .style("opacity", 1);
+*/
+    var qt = deth; //??
+
+    var rt = d3.scale.linear()
+			   .domain(d3.extent(arr.map(function (d) { return d[globalsecondVar]; })))
+               .range([2, 8])//([3 * (qt / deth), 9 * (qt / deth)]); qt / deth = 1!
+
+    var bars = details.selectAll("g.bars")
+					  .data(arr)
+                      .enter().append("svg:g")
+					  .attr("class", "cldetails")
+					  .attr("transform", function (d) { return "translate(" + x(d["city"]) + ",0" + /*(deth - y(d[globalfirstVar])) + */")"; });
+//details should update to experiment choice!
+
+    bars.append("circle")
+        .attr("city", function (d) { return d.city; })
+        .attr("school", function (d) { return d.school; })
+        .attr("ph", function(d) { return d[globalfirstVar]; })
+        .attr("tph", function(d) { return d[globalsecondVar]; })
+        .attr("r", function (d) { return rt(d[globalsecondVar]); })
+        .style("fill", function (d) { return c(d[globalfirstVar]); })
+        .style("stroke", function (d) { return d3.rgb(c(d[globalfirstVar])).darker(); })
+        .attr("transform", function (d) { return "translate(0," + (deth - y(d[globalfirstVar])) + ")"; })
+        .on("mouseover", clover)
+        .on("mousemove", clmove)
+        .on("mouseout", clout);
+
+			
+    bars.append("circle")
+//        .attr("class", "hisrect")
+        .attr("r", 2)
+        .style("fill", function (d) { return d3.rgb(c(d[globalfirstVar])).darker(); })
+        .style("stroke", "none")
+        .attr("transform", function (d) { return "translate(0," + (deth - y(d[globalfirstVar])) + ")"; });
+
+/*    bars.append("line")
+            .style("stroke", function (d) { return d3.rgb(c(d[globalfirstVar])).darker(); })
+        //.attr("x1", function(d) {return x(d["city"]); })
+        //.attr("x2", function(d) {return x(d["city"]); })
+            .style("opacity", 0.4)
+            .attr("y1", deth)
+            .attr("y2", function (d) { return (deth - y(d[globalfirstVar])); })
+		//	.on("mouseover", oplichten...  );
+*/
+
+
+    bars.append("text")
+        .attr("y", function (d) { return deth - y(d); })
+//       .attr("y", function (d) { return deth - ((d["city"].length) * 11 / 2); })
+        .style("fill", "#444")//function (d) { return "#5D5DE9"; })
+    //   .style("writing-mode", "tb-rl")
+       //.style("glyph-orientation-vertical", 0)
+        .style("font-size", "8px")
+        .text(function (d) { return d["city"]; })
+ //      .attr("x", 5)
+//       .style("text-align", "left")
+		.attr("transform", "translate("+ 5 + "," + deth + ")rotate(-90)")
+		.on("mouseover", Flashy)
+		.on("mouseout", Flushy);
+
+			
+function Flashy(d, i) {
+
+		d3.select(this)
+		
+		  .transition()
+		  .duration(50)
+		  .style("fill", "black")
+		  .style("font-weight", "bold")
+		  .style("font-size", "12px");
+		
+};					
+	
+
+function Flushy(d, i) {
+
+		d3.select(this)
+		
+		  .transition()
+		  .duration(500)
+		  .style("fill", "#222")
+		  .style("font-weight", "normal")
+		  .style("font-size", "8px");
+		
+};			
+	
+			
+    detailsCircles = details.selectAll(".cldetails");
+
+	
+   d3.select("#details")
+     .on("click", function () {
+       
+		detailsCircles = null;
+
+ 	    d3.select("#details")
+		  .style('display', 'none');
+
+        d3.select("#histo")
+		  .style("background", "none");
+
+        //this is a lot of html within the code
+        d3.select("#theNumbers")
+          .html("<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" + reeks.length + "</span><br/><br/><span class=\"statlabel\">average " + globalfirstVarlabel + ": </span><span class=\"stat\">" + gemfirstVar + "</span><br/><span class=\"statlabel\">average " + globalsecondVarlabel + ": </span><span class=\"stat\">" + gemsecondVar + "</span>")
+          .style("z-index", 10);
+
+        doHistogram(reeks);
+		
+        if (!isExists(selectedPath)) return;
+		
+        selectedPath.attr("fill", "#222");
+        
+		selectedPath = null;
+    });
+};
+
+
+
+
+d3.select("#experiments")
+  .on("change", updateDataset);
+
+d3.selectAll("#watertypes, #watersources")
+  .on("change", updateVisibility);
+
+
+ 
+d3.select(window).on("keydown", function() {checkKey();});
+
+var checkKey = function() { // this function translates a key press event into actions.
+
+	console.log(d3.event.keyCode); // just so you know which keyCode corresponds to what key
+
+	switch (d3.event.keyCode) {
+
+		case 83: stampede();break; // I am claiming the letter s.
+
+		case 72: svg.select(".hat")
+				    .style("visibility",function() { 
+										if (svg.select(".hat").style("visibility")=="hidden"){ 
+										return "visible"; }
+										else
+										{ return "hidden"; }
+										})
+	}
+}
+
+var stampede = function () {
+
+	var h = height,
+		w = width;
+
+	var allosaurus="m 503.52,533.18 c -0.52,-0.64 -1.19,-0.77 -2.55,-0.48 -3.93,0.82 -0.90,-3.29 3.17,-4.31 1.44,-0.36 3.07,-0.87 3.63,-1.14 1.50,-0.73 2.55,-3.08 2.46,-5.54 -0.04,-1.18 -0.06,-3.57 -0.05,-5.31 0.04,-4.04 -1.55,-10.29 -3.57,-14.00 -0.86,-1.59 -1.94,-3.79 -2.40,-4.90 -1.23,-2.99 -6.65,-8.51 -11.34,-11.56 -1.01,-0.66 -3.43,-1.88 -5.36,-2.72 l -3.51,-1.52 -2.31,3.18 c -2.40,3.31 -3.32,6.73 -2.38,8.81 0.35,0.77 0.21,0.95 -0.73,0.95 -0.90,0 -1.23,0.36 -1.44,1.57 -0.49,2.85 -3.45,9.75 -4.58,10.66 -0.60,0.49 -1.17,1.46 -1.25,2.15 -0.23,1.98 -1.27,1.96 -1.59,-0.03 -0.35,-2.19 -0.66,-2.20 -2.64,-0.04 -0.86,0.94 -2.04,1.71 -2.60,1.71 -0.63,0 -1.11,0.43 -1.26,1.14 -0.31,1.47 -1.98,1.53 -1.98,0.07 0,-2.16 1.86,-6.16 4.17,-8.94 3.15,-3.80 3.85,-5.54 4.14,-10.27 l 0.24,-3.97 2.08,-1.50 c 1.14,-0.82 3.00,-2.98 4.14,-4.79 l 2.06,-3.29 -2.33,-2.68 c -1.28,-1.47 -2.72,-3.43 -3.20,-4.34 -1.52,-2.92 -5.12,-4.40 -12.00,-4.94 -6.78,-0.52 -9.17,-1.47 -11.79,-4.65 l -1.60,-1.95 -2.32,0.79 c -3.47,1.18 -14.24,1.13 -16.84,-0.08 -3.29,-1.53 -3.70,-1.33 -7.70,3.77 -3.93,5.03 -4.84,6.61 -4.84,8.41 0,0.62 -0.28,2.23 -0.63,3.58 -0.35,1.34 -1.11,4.32 -1.70,6.60 -0.58,2.28 -1.23,4.15 -1.44,4.15 -0.20,0 -0.39,-1.48 -0.40,-3.29 -0.02,-2.48 -0.12,-2.98 -0.43,-2.04 -0.73,2.26 -4.23,8.76 -4.71,8.76 -0.25,0 -0.36,-0.35 -0.22,-0.79 0.13,-0.43 0.67,-2.51 1.20,-4.62 0.52,-2.11 1.24,-4.52 1.60,-5.36 2.16,-5.10 2.79,-9.06 0.80,-5.08 -1.06,2.13 -5.60,5.31 -8.39,5.88 -1.79,0.36 -1.85,0.46 1.67,-2.71 0.79,-0.71 1.89,-2.15 2.44,-3.19 0.55,-1.04 1.47,-2.12 2.05,-2.39 0.57,-0.27 1.76,-1.72 2.64,-3.23 0.87,-1.50 2.33,-3.65 3.23,-4.77 2.11,-2.63 4.60,-6.62 4.60,-7.37 0,-0.32 -0.98,-1.04 -2.19,-1.61 -2.75,-1.28 -7.14,-4.32 -9.70,-6.69 -2.47,-2.29 -3.37,-4.58 -3.37,-8.60 l 0,-3.18 -3.12,-2.27 c -2.91,-2.11 -6.76,-5.30 -12.76,-10.56 -2.79,-2.44 -5.60,-3.46 -8.02,-2.90 -1.84,0.42 -3.57,2.46 -7.71,9.07 -1.56,2.50 -3.99,5.68 -5.39,7.06 -3.57,3.53 -4.39,4.49 -8.45,10.02 -4.07,5.55 -6.05,6.87 -7.96,5.32 -1.01,-0.82 -1.47,-3.21 -0.62,-3.21 0.19,0 0.22,-0.40 0.07,-0.90 -0.20,-0.65 -0.03,-0.85 0.59,-0.71 0.52,0.11 0.82,-0.10 0.74,-0.56 -0.16,-0.96 1.05,-2.46 1.83,-2.27 0.36,0.09 0.54,-0.27 0.45,-0.92 -0.10,-0.78 0.05,-0.98 0.57,-0.73 0.51,0.24 0.72,0.00 0.72,-0.80 0,-0.77 0.26,-1.09 0.81,-0.98 0.58,0.12 0.85,-0.27 0.95,-1.41 0.08,-0.87 0.34,-1.43 0.57,-1.25 0.43,0.32 0.61,-0.47 0.45,-1.94 -0.04,-0.42 0.18,-0.65 0.52,-0.51 0.33,0.14 1.18,-0.51 1.88,-1.47 1.96,-2.68 1.57,-7.28 -0.90,-10.79 -0.75,-1.06 -1.98,-0.78 -1.98,0.45 0,0.43 -0.15,0.76 -0.34,0.72 -1.26,-0.24 -2.03,0.15 -1.79,0.92 0.16,0.53 -0.00,0.85 -0.44,0.85 -0.38,0 -0.57,0.25 -0.42,0.57 0.15,0.31 -0.03,0.57 -0.43,0.57 -0.39,0 -0.72,-0.25 -0.72,-0.57 0,-0.31 -0.22,-0.57 -0.49,-0.57 -0.26,0 -0.36,0.25 -0.20,0.57 0.15,0.31 0.05,0.57 -0.23,0.57 -0.28,0 -0.37,0.28 -0.19,0.63 0.44,0.89 -0.75,1.66 -2.00,1.28 -0.82,-0.25 -0.99,-0.13 -0.76,0.59 0.23,0.74 0.01,0.87 -1.14,0.71 -1.07,-0.15 -1.49,0.05 -1.69,0.86 -0.31,1.21 -0.72,1.34 -1.45,0.44 -0.34,-0.42 -0.59,-0.43 -0.80,-0.02 -0.16,0.32 -0.60,0.45 -0.98,0.27 -0.50,-0.23 -0.60,-0.05 -0.36,0.69 0.24,0.79 0.14,0.93 -0.45,0.65 -0.49,-0.23 -0.77,-0.08 -0.77,0.43 0,0.54 -0.41,0.74 -1.27,0.61 -0.70,-0.10 -1.72,-0.21 -2.27,-0.25 -1.25,-0.08 -3.39,-4.41 -3.39,-6.86 0,-1.63 2.67,-7.06 5.27,-10.71 0.53,-0.74 1.70,-2.39 2.59,-3.66 0.89,-1.26 1.85,-2.29 2.14,-2.29 0.28,-7.6e-4 0.78,-0.38 1.09,-0.86 0.31,-0.47 0.96,-0.85 1.44,-0.85 0.47,0 0.86,-0.26 0.86,-0.58 0,-0.32 0.52,-0.83 1.15,-1.13 0.71,-0.33 1.56,-1.59 2.21,-3.27 0.89,-2.31 1.23,-2.70 2.19,-2.54 0.62,0.10 1.57,0.68 2.09,1.28 1.13,1.29 2.90,1.43 3.26,0.25 0.30,-0.98 7.67,-6.00 11.57,-7.87 2.36,-1.13 3.54,-1.30 8.96,-1.29 6.03,0.01 6.35,0.07 9.25,1.80 1.65,0.98 5.38,4.13 8.28,7.00 7.14,7.07 10.01,9.15 13.67,9.90 2.70,0.55 3.33,0.47 6.82,-0.86 8.23,-3.14 17.16,-5.69 24.53,-6.98 5.48,-0.96 18.21,-1.11 23.97,-0.28 2.16,0.31 6.85,0.82 10.41,1.14 6.70,0.59 11.65,1.71 19.20,4.32 12.53,4.33 25.72,6.62 40.03,6.96 12.27,0.28 15.26,-0.14 32.40,-4.69 12.43,-3.30 16.33,-3.89 25.92,-3.93 9.67,-0.04 15.42,0.92 25.45,4.29 29.03,9.72 43.96,17.84 56.47,30.69 3.61,3.71 6.00,8.16 4.37,8.16 -0.26,0 -2.19,-1.56 -4.28,-3.47 -3.41,-3.11 -8.44,-6.44 -18.15,-12.00 -4.99,-2.85 -5.38,-3.01 -16.54,-6.86 -4.86,-1.67 -11.29,-3.30 -18.16,-4.59 -3.30,-0.62 -7.78,-1.50 -9.95,-1.97 -10.67,-2.28 -30.60,0.79 -41.31,6.38 -2.10,1.09 -5.48,2.76 -7.52,3.70 -2.03,0.94 -5.88,2.88 -8.54,4.32 -6.06,3.26 -17.47,7.27 -24.24,8.52 -4.05,0.74 -6.83,0.87 -13.02,0.57 -6.92,-0.32 -8.44,-0.23 -12.69,0.82 -7.25,1.80 -13.10,5.82 -13.72,9.41 -0.16,0.95 -0.68,2.26 -1.17,2.91 -0.86,1.16 -0.85,1.20 0.45,2.75 0.73,0.86 2.09,3.68 3.02,6.26 3.83,10.60 5.56,12.92 13.29,17.86 4.18,2.67 5.57,4.47 6.18,8.00 1.59,9.26 3.13,13.17 4.98,12.64 1.18,-0.33 1.04,1.75 -0.17,2.56 l -0.98,0.64 1.09,0.67 c 1.32,0.81 1.54,1.92 0.81,4.12 -0.30,0.92 -0.50,2.02 -0.44,2.45 0.21,1.56 -3.49,11.48 -4.46,11.94 -0.32,0.15 -0.58,0.75 -0.58,1.32 0,1.22 -1.01,2.20 -1.28,1.23 -0.12,-0.47 -0.45,-0.44 -1.18,0.11 -1.42,1.09 -5.67,1.07 -6.56,-0.02 z";
+	
+	var trex="m 379.79,643.37 c -4.01,0.57 -4.47,0.55 -6.96,0.77 -3.21,0.29 -5.20,0.36 -7.26,-3.44 -1.29,-2.38 -3.83,-3.84 -7.61,-4.38 -2.89,-0.12 -6.43,-0.61 -10.60,-1.45 -7.58,-1.87 -15.03,-4.64 -22.35,-8.28 -0.26,-0.05 -0.51,-0.11 -0.75,-0.19 -0.27,0.66 -0.69,1.33 -1.28,1.94 -1.53,1.58 -2.92,3.65 -3.89,5.83 -0.27,0.72 -0.72,1.48 -1.20,2.25 -0.09,0.10 -0.27,0.55 -0.62,1.22 -0.19,0.29 -0.64,0.58 -0.88,0.18 -0.28,0.32 -0.56,1.02 -0.82,1.46 -0.09,0.20 -0.21,0.20 -0.40,0.46 -0.20,0.21 -0.52,0.85 -0.91,1.47 -0.17,0.20 -0.36,0.30 -0.58,0.31 l 0,4.1e-4 c -0.03,0.13 -0.08,0.31 -0.19,0.43 -0.39,0.43 -0.69,0.77 -1.33,0.69 -0.44,-0.05 -0.95,-0.48 -0.82,-0.47 0.31,0.02 1.13,-0.46 1.24,-0.76 0.04,-0.13 0.09,-0.40 0.18,-0.56 -0.12,-0.35 -0.00,-0.67 0.33,-0.95 0.37,-0.28 0.66,-0.63 0.86,-1.05 0.27,-0.60 0.50,-1.01 0.69,-1.23 0.17,-0.19 0.15,-0.38 0.29,-0.66 0.13,-0.28 0.42,-0.65 0.58,-0.89 -0.34,0.09 -0.94,0.46 -1.79,1.09 -0.26,0.20 -0.54,0.18 -0.78,0.03 -0.08,0.08 -0.29,0.20 -0.39,0.22 -0.24,0.04 -0.53,0.02 -0.77,-0.07 -0.10,-0.04 -0.20,-0.10 -0.28,-0.18 -0.60,-0.55 -0.46,-1.27 -0.43,-1.19 0.13,0.26 0.67,0.69 1.29,0.15 l 0.03,-0.02 c 6.8e-4,-0.32 0.19,-0.52 0.58,-0.57 1.40,-0.36 1.57,-0.93 2.48,-2.05 0.46,-0.57 0.32,-1.12 0.81,-1.98 0.68,-1.21 1.01,-1.45 2.21,-3.29 1.09,-1.67 1.45,-2.74 1.22,-4.41 l -0.55,-0.29 c -0.12,1.47 -1.36,4.12 -3.57,4.71 -1.95,0.52 -3.95,1.56 -5.61,2.95 -0.51,0.48 -1.19,0.90 -1.90,1.31 -0.12,0.04 -0.45,0.33 -1.01,0.72 -0.28,0.15 -0.79,0.14 -0.85,-0.34 -0.37,0.12 -0.88,0.58 -1.27,0.82 -0.16,0.12 -0.27,0.05 -0.53,0.18 -0.26,0.06 -0.78,0.46 -1.35,0.79 -0.23,0.08 -0.44,0.06 -0.63,-0.05 l 0,4.1e-4 c -0.08,0.10 -0.19,0.23 -0.33,0.27 -0.51,0.16 -0.90,0.29 -1.44,-0.14 -0.37,-0.30 -0.67,-0.97 -0.55,-0.89 0.26,0.19 1.18,0.23 1.39,0.03 0.09,-0.09 0.23,-0.30 0.37,-0.40 0.02,-0.38 0.24,-0.60 0.65,-0.65 0.43,-0.03 0.82,-0.18 1.15,-0.44 0.46,-0.37 0.82,-0.61 1.07,-0.69 0.22,-0.07 0.28,-0.25 0.50,-0.42 0.22,-0.17 0.62,-0.34 0.85,-0.45 -0.34,-0.11 -1.01,-0.12 -1.99,-0.04 -0.31,0.03 -0.55,-0.15 -0.70,-0.41 -0.10,0.02 -0.34,0.01 -0.43,-0.02 -0.23,-0.10 -0.48,-0.28 -0.66,-0.50 -0.07,-0.10 -0.14,-0.21 -0.18,-0.32 -0.32,-0.83 0.05,-1.39 0.06,-1.30 0.01,0.31 0.34,1.00 1.09,0.87 l 0.03,-7e-4 c 0.12,-0.29 0.36,-0.35 0.73,-0.17 1.38,0.48 1.74,0.07 2.96,-0.40 0.62,-0.24 0.70,-0.81 1.45,-1.29 1.05,-0.68 1.44,-0.71 3.18,-1.66 1.79,-0.97 2.73,-2.40 3.13,-4.50 -3.70,-2.23 -6.18,-4.19 -7.17,-5.81 -1.23,-2.45 -1.64,-6.13 -1.23,-11.04 -8.40,-1.58 -9.54,-1.25 -12.34,-3.04 -10.52,-5.09 -21.52,9.03 -30.60,15.57 -4.94,2.17 -5.61,2.10 -9.62,5.17 -3.12,2.38 -6.10,5.28 -11.64,8.72 -2.00,0.58 -3.90,0.55 -7.04,-2.02 -0.74,-0.51 -1.28,-1.76 -0.74,-2.97 0.20,-0.11 0.40,-0.22 0.61,-0.32 -0.29,-0.72 -0.77,-1.43 -0.60,-2.75 0.49,0.70 1.06,1.73 1.48,2.30 l 0.34,-0.17 c -0.28,-1.22 -0.78,-3.00 -0.37,-4.17 0.52,1.01 1.08,2.52 1.51,3.60 l 0.47,-0.23 c -0.24,-1.35 -0.48,-3.28 -0.32,-3.99 0.16,0.69 0.95,2.27 1.63,3.34 0.38,-0.19 0.77,-0.39 1.16,-0.59 -0.42,-1.44 -0.61,-3.24 -0.53,-4.44 0.35,0.80 1.28,2.46 2.03,3.64 0.24,-0.13 0.49,-0.28 0.74,-0.42 -0.40,-1.06 -0.91,-2.57 -0.91,-3.37 0.41,0.66 1.34,1.85 2.06,2.66 0.37,-0.23 0.73,-0.48 1.09,-0.73 -0.33,-0.80 -0.70,-1.82 -0.67,-2.55 0.27,0.25 0.98,1.22 1.56,1.90 0.14,-0.11 0.29,-0.22 0.43,-0.34 -0.27,-0.56 -0.54,-1.30 -0.63,-2.01 0.30,0.29 0.86,0.96 1.29,1.45 0.13,-0.12 0.27,-0.24 0.41,-0.37 -0.33,-0.67 -0.73,-1.58 -0.74,-1.81 0.26,0.18 1.02,0.64 1.59,0.98 0.19,-0.20 0.38,-0.41 0.57,-0.63 -0.53,-0.77 -0.73,-1.70 -0.74,-1.98 0.25,0.17 1.00,0.65 1.53,0.99 1.54,-2.08 2.66,-4.62 3.10,-7.84 0.85,-2.77 0.87,-3.29 2.42,-6.06 -0.87,-3.25 -1.45,-9.21 -4.06,-13.37 -1.03,-0.75 -2.21,-1.00 -3.54,-0.75 -0.44,0.10 -0.88,0.20 -1.31,0.29 0.06,0.94 0.15,2.02 0.20,2.32 -0.64,-0.39 -1.06,-1.28 -1.36,-2.07 l -0.71,0.14 c 0.09,1.08 0.23,2.40 0.35,3.19 -0.93,-0.98 -1.26,-2.06 -1.43,-2.97 -0.20,0.04 -0.40,0.08 -0.60,0.11 0.24,1.49 0.84,3.45 1.08,4.15 -1.70,-1.24 -2.14,-2.75 -2.38,-3.92 -0.19,0.03 -0.38,0.06 -0.57,0.09 0.10,1.67 0.53,4.10 0.77,5.10 -1.48,-1.17 -2.12,-3.29 -2.44,-4.87 -0.20,0.02 -0.41,0.04 -0.61,0.06 -0.10,1.10 -0.24,2.56 -0.27,3.03 -0.23,-0.40 -0.54,-1.77 -0.79,-2.95 -0.28,0.01 -0.57,0.02 -0.84,0.03 -0.06,0.88 -0.11,1.96 -0.06,3.08 -0.38,-0.40 -0.74,-1.89 -0.98,-3.08 -0.24,-0.00 -0.49,-0.02 -0.73,-0.03 0.03,1.50 0.15,3.36 0.49,4.85 -1.39,-1.05 -1.89,-3.25 -2.17,-5.03 -0.33,-0.04 -0.67,-0.08 -1.03,-0.13 0.23,1.31 0.57,3.03 1.24,5.03 -1.59,-0.84 -2.44,-3.31 -2.93,-5.30 -0.28,-0.05 -0.57,-0.11 -0.85,-0.17 0.20,1.40 0.44,3.19 0.58,3.73 -0.75,-0.41 -1.69,-2.57 -2.19,-4.16 -0.32,-0.10 -0.64,-0.20 -0.95,-0.32 0.27,1.32 0.71,3.09 0.93,3.71 -0.87,-0.71 -2.04,-2.92 -2.66,-4.54 -1.11,-0.65 -2.07,-1.52 -2.72,-2.66 -0.20,-2.19 -0.09,-2.73 0.10,-4.93 0.42,-2.34 1.56,-4.57 2.49,-5.29 0.95,-0.59 2.41,-1.37 4.38,-2.34 3.24,-2.15 8.25,-3.50 15.02,-4.03 2.81,0.06 5.43,-0.50 7.85,-1.69 1.91,-1.53 3.62,-1.81 5.11,-0.82 1.70,-1.01 3.45,-1.42 5.23,-1.22 13.98,-12.50 22.80,-9.11 39.64,2.28 2.20,1.43 6.93,1.43 14.19,4.2e-4 9.85,-4.34 17.37,-5.71 26.51,-7.49 9.72,-1.89 19.79,-2.96 30.20,-3.22 3.93,-0.09 6.80,0.35 10.74,0.48 2.69,0.12 6.28,0.37 10.74,0.32 6.13,-0.17 9.47,1.40 16.58,3.48 13.48,1.88 20.69,5.93 35.15,8.47 7.51,1.92 15.51,3.99 23.99,6.22 10.91,2.09 26.03,3.06 45.36,2.91 9.51,0.12 18.02,0.81 25.51,2.06 10.32,1.72 20.37,2.53 30.66,4.03 6.46,0.94 12.78,2.17 18.97,3.69 14.59,1.99 28.07,3.66 40.41,5.01 5.64,0.71 11.25,1.96 16.84,3.75 0.32,0.09 0.51,0.14 0.83,0.23 2.96,0.83 4.93,1.99 4.93,2.58 0,0.50 -1.91,0.55 -4.93,0.07 -1.57,-0.24 -3.55,-0.56 -5.39,-0.84 -13.56,-1.92 -27.59,-2.61 -42.10,-2.05 -12.32,-0.10 -23.40,0.40 -33.24,1.54 -11.70,1.38 -22.97,2.10 -33.83,2.13 -7.49,0.26 -17.01,1.52 -28.56,3.78 -18.77,6.34 -32.43,9.28 -52.42,7.43 -6.41,-0.59 -11.32,0.05 -14.71,1.92 -2.73,2.13 -5.06,4.52 -6.99,7.16 -1.57,2.16 -2.49,3.84 -3.18,6.48 -0.48,1.86 -2.06,2.73 -4.76,2.59 -1.06,0.04 -2.84,0.33 -5.34,0.88 -3.12,0.32 -5.97,1.13 -8.54,2.42 2.55,3.47 4.21,12.43 4.96,26.86 1.20,6.87 6.08,12.51 6.87,18.66 0.08,1.75 0.34,4.08 1.06,6.57 0.84,2.93 0.98,5.39 0.33,8.46 -1.04,2.95 -1.39,4.62 -1.04,7.00 0.61,1.02 1.02,1.46 0.97,1.88 0.36,0.60 0.31,0.87 0.14,1.08 0.49,0.51 0.57,1.02 2.51,2.00 0.14,0.07 -1.00,0.42 -2.35,0.24 -0.25,-0.03 -0.53,-0.08 -0.81,-0.16 -0.02,0.32 -0.11,0.52 -0.38,0.47 -0.17,1.59 -0.16,3.12 -0.37,4.73 -0.24,1.84 0.02,3.99 -1.19,5.95 -1.13,1.82 -3.41,1.22 -6.82,1.39 -2.15,-0.12 -5.94,0.03 -9.41,-0.06 -0.48,-0.01 -1.59,-0.18 -2.85,-0.10 -3.92,0.23 -4.69,0.11 -5.02,-0.43 -0.08,-0.13 -0.04,-0.43 0.03,-0.83 -1.30,-0.21 -2.88,0.06 -4.73,0.84 0.97,-2.61 2.73,-3.79 5.26,-3.57 0.01,-0.16 0.03,-0.32 0.04,-0.49 0.02,-0.41 2.50,0.55 3.28,0.17 1.22,-0.60 2.01,0.20 3.68,-0.14 0.90,-0.19 1.83,-0.73 2.82,-0.96 0.67,-0.15 1.44,0.02 2.02,-0.15 1.44,-0.46 2.64,-2.32 4.09,-3.38 2.01,-1.46 2.32,-4.24 2.51,-6.93 0.13,-1.99 0.19,-4.37 0.18,-6.91 0.04,-2.52 -0.28,-5.29 -0.98,-8.28 -1.19,-1.91 -1.80,-4.79 -1.83,-8.63 -0.16,-3.71 -2.06,-9.27 -5.69,-16.66 -0.51,-0.95 -3.53,-2.97 -5.11,-4.78 -0.99,0.03 1.63,4.62 2.31,6.10 2.22,4.75 2.57,8.47 1.06,11.15 -1.96,3.39 -2.54,4.32 -3.35,5.00 -1.87,2.69 -1.93,2.02 -3.84,6.97 -0.21,0.56 -0.45,1.20 -0.72,1.92 0.23,1.40 0.30,2.55 0.23,3.45 0.04,0.46 -0.08,0.56 -0.27,0.52 0.16,0.69 0.38,1.53 0.50,1.81 0.07,0.24 0.31,0.62 0.76,1.11 0.37,0.41 -2.01,-0.32 -2.78,-2.57 -0.12,0.18 -0.26,0.35 -0.46,0.44 -0.35,0.15 -0.15,1.54 -0.19,2.65 1.22,4.38 -1.43,4.14 -3.57,6.94 -1.45,1.89 -3.01,5.14 -4.86,7.04 -0.66,0.68 -2.07,1.26 -2.53,1.44 -0.52,0.20 -0.83,-0.10 -1.06,-0.58 -1.16,0.64 -2.03,1.85 -2.43,5.04 -1.05,-3.44 -0.74,-5.94 0.93,-7.48 -0.95,0.15 -1.51,1.58 -2.46,1.58 -1.21,-0.00 -7.68,3.71 -8.19,2.06 -0.04,-0.13 -0.05,-0.42 -0.05,-0.79 -1.25,-0.16 -2.66,0.32 -4.21,1.46 1.29,-2.90 2.77,-4.33 4.44,-4.25 0.02,-0.19 0.05,-0.34 0.07,-0.45 0.37,-1.74 2.69,-0.50 4.78,-3.19 0.20,-0.26 2.73,-1.58 3.61,-3.41 1.22,-2.55 1.10,0.28 4.63,-7.64 0.54,-2.66 4.43,-5.95 5.94,-6.97 3.77,-5.32 5.95,-8.68 6.46,-14.31 -0.64,-4.70 0.31,-5.37 0.03,-7.78 -0.24,-2.04 -1.81,-4.22 -4.04,-7.18 -7.68,-5.85 -8.16,-6.25 -12.76,-12.76 z";
+
+	var raptor="m 394.96,797.27 c 0,0 0.55,4.46 -7.80,9.34 -8.36,4.87 -12.82,7.10 -14.91,4.32 -2.09,-2.78 -0.69,-8.92 -1.67,-9.06 -0.97,-0.13 -4.46,4.46 -5.15,3.62 -0.69,-0.83 2.23,-3.06 2.09,-6.41 -0.13,-3.34 0.27,-4.04 -2.36,-5.43 -2.64,-1.39 -7.80,-6.97 -8.50,-9.89 -0.69,-2.92 -0.13,-8.36 -0.13,-8.36 0,0 -5.01,0.41 -10.31,-4.32 -5.29,-4.73 -6.55,-11.98 -11.01,-13.10 -4.46,-1.11 -18.10,2.95 -23.12,4.20 -5.01,1.25 -7.40,1.64 -9.07,1.36 -1.67,-0.27 -2.36,-2.36 -1.25,-3.20 1.11,-0.83 5.71,-0.69 9.75,-2.09 4.04,-1.39 9.34,-3.06 9.20,-4.46 -0.13,-1.39 -2.36,-0.97 -4.73,-0.27 -2.36,0.69 -8.64,3.76 -11.57,3.76 -2.92,0 -5.16,-0.15 -5.23,-3.01 -0.07,-2.85 7.53,-5.82 12.25,-8.82 4.71,-3.00 9.28,-9.35 19.85,-9.28 10.57,0.07 11.00,0.64 16.14,6.14 5.14,5.50 10.00,12.35 14.07,13.07 4.07,0.71 15.07,-0.92 23.85,-0.64 8.78,0.28 31.71,3.00 48.21,7.28 16.50,4.28 22.66,7.42 31.76,7.07 9.09,-0.35 26.24,-5.50 41.38,-7.35 15.14,-1.85 40.14,-2.07 50.93,-0.71 10.78,1.35 19.21,4.35 25.85,8.14 6.64,3.78 12.07,6.78 11.85,8.85 -0.21,2.07 -1.50,2.92 -5.71,2.85 -4.21,-0.07 -28.71,-5.64 -34.21,-5.92 -5.50,-0.28 -4.35,0.71 -8.14,0.28 -3.78,-0.42 -5.28,-1.78 -7.42,-1.85 -2.14,-0.07 -6.21,-0.78 -11.28,-1.78 -4.58,-0.90 -6.42,-2.00 -17.71,-1.35 -11.28,0.64 -31.86,6.57 -42.57,8.14 -10.71,1.57 -20.78,2.07 -26.43,4.50 -5.64,2.42 -6.14,3.92 -6.92,5.42 -0.78,1.50 0,2.57 -0.64,4.21 -0.64,1.64 -1.42,1.07 -1.42,2.57 0,1.50 0.57,1.85 0.14,4.00 -0.42,2.14 -1.57,1.92 -1.85,3.85 -0.28,1.92 0.14,3.64 -0.78,5.50 -0.92,1.85 -5.78,4.57 -6.57,6.42 -0.78,1.85 0.21,5.14 -0.57,6.85 -0.78,1.71 -9.14,8.42 -9.78,10.92 -0.64,2.50 0.28,2.71 0,3.21 -0.28,0.50 -2.71,3.35 -10.50,3.21 -7.78,-0.14 -8.17,-2.35 -9.92,-2.32 -1.75,0.03 -2.64,2.82 -3.78,2.35 -1.14,-0.46 -0.10,-2.10 0.82,-3.03 0.92,-0.92 3.92,-1.35 7.78,-1.25 3.85,0.10 7.71,-0.67 7.71,-0.67 0,0 -2.46,-1.50 -2.50,-3.35 -0.03,-1.85 1.28,-2.96 1.17,-4.57 -0.10,-1.60 -4.10,-0.82 -4.64,-1.64 -0.53,-0.82 1.32,-2.46 3.17,-2.35 1.85,0.10 3.17,1.46 3.71,3.14 0.53,1.67 0.50,4.67 1.53,4.64 1.03,-0.03 1.53,-3.35 1.89,-7.67 0.35,-4.32 0.39,-5.89 -1.82,-9.85 -2.21,-3.96 -13.00,-15.14 -13.05,-15.19 z";
+
+	var dinosaurs = [ {name: "allosaurus", path: allosaurus, offsety: -450, offsetx:-300},
+					  {name: "trex", path: trex, offsety: -700, offsetx: -400},
+					  {name: "raptor", path: raptor, offsety: -800, offsetx:-250} ];
+
+	var k = 25;
+	
+	var dinosaursNb = k +~~ (Math.random() * k);
+	
+	var colorScale = d3.scale.linear()
+						     .domain([0,dinosaursNb])
+						     .range(["#030","green"]);
+	
+	var dinodata = d3.range(dinosaursNb)
+					  .map(function(d) { var i =~~ (Math.random() * 3);
+					  return {name: dinosaurs[i].name, path: dinosaurs[i].path, y:~~ (Math.random() * h) + dinosaurs[i].offsety, x: w + dinosaurs[i].offsetx, duration: 300 +~~ (Math.random() * 500) }; });
+
+		svg.selectAll(".dinosaur")
+		   .data(dinodata)
+		   .enter().append("path")
+		   .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+  		   .attr("d",function(d) { return d.path; })
+		   .style("fill", function(d,i) { return colorScale(i); })
+		   .style("stroke", "#010")
+
+		   .transition()
+		   .duration(function(d) { return d.duration; })
+		   .attr("transform", function(d) { return "translate(" + (d.x - 1.2 * w) + "," + d.y + ")"; })
+		   .each("end", function() { d3.select(this )
+									   .remove(); })
+};
+		
+		
+function sombrero(d,k) {
+	{var proj = projection(d.coordinates), x = proj[0], y = proj[1], p = [[-0.666666666666667,0],[0,0],[0.111109644520414,-1.36864370425612],[0.77777631118708,-1.36864370425612],[0.666666666666667,0],[0.861110194491925,1.34790537850139],[0.861110194491925,1.34790537850139],[0,0],[-0.222221488926874,0.186633932362304],[-0.77777631118708,0.207370058230984],[-0.555554822260207,0.0207449254128636],[-0.861110194491925,-0.186631732476258],[-0.861110194491925,-0.186631732476258]];
+	
+	function path(k) {
+	var path = "m " + p[0][0] * k + "," + p[0][1] * k + " c "; 
+	p.slice(1, p.length)
+	 .forEach(function(p) { path += p[0] * k + "," + p[1] * k + " "; });
+	return path + "z";
+	}
+
+	var hat = svg.select(".hat");
+	
+	var mySombrero = hat.append("svg:g")
+						.style("fill", "#f8da72")
+						.style("stroke", "black")
+						.style("stroke-width", "0.25")
+						.attr("transform","translate(" + x +"," + (-.75 * k + y) + ") rotate(" + (10 * Math.random()-5) + ")");
+						
+	mySombrero.append("ellipse")
+			  .attr("cx",0)
+			  .attr("cy",0)
+			  .attr("rx",2 * k)
+			  .attr("ry",3 * k / 8);
+			  
+	mySombrero.append("path")
+			  .attr("d",path(k));}
+
+};
+ 
+  
 </script>
