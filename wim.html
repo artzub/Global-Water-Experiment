@@ -756,7 +756,7 @@ d3.json("/sites/default/files/sprint/data/gwe_experiment3_v1.json", function(di_
 // refill circles
 
     rondjes = svg.select("#datapoints").selectAll("circle")
-									   .data(data, function(d) { return d.coordinates; })
+									   .data(data)
 									
 	rondjes.enter().append("circle")
 		.attr('class', 'measurementCircle')
@@ -782,8 +782,8 @@ d3.json("/sites/default/files/sprint/data/gwe_experiment3_v1.json", function(di_
 		   .duration(1000)
 		   .style("fill", function (d) { return c(d[firstVar]); })
 		   .style("stroke", function (d) { return d3.rgb(c(d[firstVar])).darker(); })
-		   .attr("r", function (d) { return r(d[secondVar]); });
-
+		   .attr("r", function (d) { return r(d[secondVar]); })
+		.attr("transform", function (d) { return "translate(" + projection(d.coordinates) + ")"; });
 	   
 	rondjes.exit()
 		   .transition()
