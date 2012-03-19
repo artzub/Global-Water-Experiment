@@ -24,7 +24,7 @@ a:visited {
 
 .feature {
     stroke: #555;
-    stroke-width: 1px;
+    stroke-width: .81px;
 }
 
 circle.node {
@@ -60,13 +60,13 @@ line, .tikkies {
     color: white;
 }
 
-#header, #subheader, a:hover, #bijbakje, #expchooser, #buttonBar, #pielabelI, #pielabelII, #histolabel_x, #histolabel_y, .stat, .statlabel, #details.astxt{
-    text-shadow: .5px .5px 1px #000;
+#header, #subheader, a:hover, #bijbakje, #expchooser, #buttonBar, #pielabelI, #pielabelII, #histolabel_x, #histolabel_y, .stat, .statlabel, #details.astxt .bartxt {
+    text-shadow: .5px -.5px 1px #000;
 }
 
 #header {
 	position: absolute;
-	top: 486px;
+	top: 491px;
 	left: 336px;
 	padding: 0px;
 	margin: 0px;	
@@ -78,7 +78,7 @@ line, .tikkies {
 #subheader {
 	position: absolute;
 	top: 25px;
-	left: 498px;
+	left: 500px;
 	padding: 0px;
 	margin: 0px;
 	font:  italic 24px 'Times New Roman';
@@ -86,14 +86,14 @@ line, .tikkies {
 	z-index: 11;
 }
 
-#details, #experiments, #mover, #sorter, #topie, #tohisto, #tomap, #schaalbakje, div.tooltip {
+#details, #experiments, #mover, #cmover, #sorter, #tmover, #tomap, #schaalbakje, div.tooltip {
     border: 1px solid midnightblue;
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    box-shadow: 4px 4px 2px dimgrey;
-    -moz-box-shadow: 4px 4px 2px dimgrey;
-    -webkit-box-shadow: 4px 4px 2px dimgrey;
+    box-shadow: 2px 2px 2px #777;
+    -moz-box-shadow: 2px 2px 2px #777;
+    -webkit-box-shadow: 2px 2px 2px #777;
 }
 
 #map {
@@ -105,7 +105,7 @@ line, .tikkies {
 
 #expchooser {
     position: absolute;
-    top: 15px;
+    top: 18px;
     left: 233px;
     z-index: 100;
     opacity: 0;
@@ -115,6 +115,7 @@ line, .tikkies {
     height: 18px;
     padding: 0px;
     font-size: 9px;
+	background-color: azure;
 }
 
 #bijbakje {
@@ -128,9 +129,98 @@ line, .tikkies {
 
 #schaalbakje {
     position: absolute;
-    top: 15px;
-    left: 104px;
+    top: 21px;
+    left: 106px;
     opacity: 0;
+}
+
+
+#buttonBar {
+	position: absolute;
+	left: 410px;
+	top: 17px;
+	width: 350px;
+	text-align: center;
+	opacity: 0;
+	z-index: 9000;
+}
+
+#mover, #sorter, #tymover, #scmover, #cmover, #tmover, #nmover, #tomap {
+	position: absolute;
+	top: 0px;
+	width: 40px;
+	height: 12px;
+	padding: 3px;
+  border: .5px solid #383838;
+  background-image: -moz-linear-gradient(top, rgba(255,255,255,.25), rgba(255,255,255,.11));
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, rgba(255,255,255,.25)),color-stop(1, rgba(255,255,255,.11)));
+  background-image: -webkit-linear-gradient(rgba(255,255,255,.25), rgba(255,255,255,.11));
+  color: #fff;
+	background-color: #222; /*dimgrey; */ 
+	text-align: center;
+	
+	
+  /* gradient button 
+  font: 10px Helvetica Neue;
+  background-color: #222;
+  background-image: -moz-linear-gradient(top, rgba(255,255,255,.25), rgba(255,255,255,.11));
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, rgba(255,255,255,.25)),color-stop(1, rgba(255,255,255,.11)));
+  background-image: -webkit-linear-gradient(rgba(255,255,255,.25), rgba(255,255,255,.11));
+  color: #fff;
+  text-rendering: optimizeLegibility;
+  text-shadow: 0 -1px 1px #222;
+  padding: 6px 10px 6px 10px;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid #222;
+  margin: 0;
+  -moz-box-shadow: 0 1px 3px #999;
+  -webkit-box-shadow: 0 1px 3px #999;
+
+	*/
+	
+}
+
+#mover {
+	left: 0px;
+}
+
+#tymover {
+	left: 56px;
+}
+
+#scmover {
+	left: 112px;
+}
+
+#tmover {
+	left: 168px;
+}
+
+#nmover {
+	left: 224px;
+}
+
+#cmover {
+	left: 280px;
+}
+
+#sorter {
+	left: 336px;
+}
+
+#tomap {	
+	left: 392px;
+}
+
+#mover:hover, #sorter:hover, #tymover:hover, #scmover:hover, #cmover:hover, #tmover:hover, #nmover:hover, #tomap:hover {
+	top: 2px;
+	border: 1px solid black;
+	background-color: lightgrey;
+	color: black;
+    box-shadow: 3px 4px 2px azure;
+    -moz-box-shadow: 3px 4px 2px azure;
+    -webkit-box-shadow: 3px 4px 2px azure;
 }
 
 #theNumbers {
@@ -140,13 +230,14 @@ line, .tikkies {
     width: 220px;
     text-align: right;
     z-index: 10;
+	opacity: 0;
 }
 
 
 #pieHole {
 	position: absolute;
-	top: 6px;
-	left: 720px;
+	top: 384px;
+	left: 626px;
 	width: 200px;
     opacity: 0;
 	text-align: center;
@@ -175,54 +266,6 @@ line, .tikkies {
 #pielabelII {
 	left: 75px;
 }
-
-
-#buttonBar {
-	position: absolute;
-	left: 418px;
-	top: 15px;
-	width: 350px;
-	text-align: center;
-	opacity: 0;
-	z-index: 9000;
-}
-
-#mover, #sorter, #topie, #tohisto, #tomap {
-	position: absolute;
-	top: 0px;
-	width: 40px;
-	height: 12px;
-	padding: 3px;
-	background-color: dimgrey;
-	text-align: center;
-}
-
-#mover {
-	left: 0px;
-}
-
-#sorter {
-	left: 56px;
-}
-
-#topie {
-	left: 112px;
-}
-
-#tohisto {
-	left: 168px;
-}
-
-#tomap {	
-	left: 224px;
-}
-
-#mover:hover, #sorter:hover, #topie:hover, #tohisto:hover, #tomap:hover {
-	top: 2px;
-	background-color: lightgrey;
-	color: black;
-}
-
 
 #histo {
     position: absolute;
@@ -270,67 +313,18 @@ div.tooltip {
     opacity: 0;
 }
 
-#details {
-    position: absolute;
-    top: 120px;
-    left: 260px;
-	min-width: 360px;
-	max-width: 500px;
-    background: #ccc;
-    display: none;
-    z-index: 9000;
-	overflow: auto;
-    opacity: 1;
-}
-
-#details line, #details .tikkies {
-    fill: none;
-    stroke: #000;
-    stroke-width: 1px;
-}
-
-#details .grid {
-    fill: none;
-    stroke: #000;
-    stroke-width: .3px;
-}
-
-#details .astxt {
-    font-size: 110%;
-    fill: #000;
-    font-weight: bold;
-}
-#details .astiktxt {
-    font-size: 8px;
-    fill: #000;
-    font-weight: bold;
-}
-
-#details .bartxt {
-	font-family: 'Arial Narrow';
-    fill: #000;
-}
-
-
-#close {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    color: dimgrey;
-    z-index: 9002;
-}
 
 </style>
-
-
-<div id="header">World Wide Water Quality
-    <div id="subheader">2011</div>
-</div>
 
 
 <div id="map">
     <div id="source">source: <a href="http://water.chemistry2011.org/web/iyc" target="_blank">The Global Experiment of
         the International Year of Chemistry</a></div>
+</div>
+
+
+<div id="header">World Wide Water Quality
+    <div id="subheader">2011</div>
 </div>
 
 
@@ -344,6 +338,24 @@ div.tooltip {
 </div>
 
  
+<div id="bijbakje"></div>
+<div id="schaalbakje"></div>
+
+
+<div id="buttonBar">
+	<div id="mover">raw</div>
+	<div id="tymover">wtype</div>
+	<div id="scmover">wsource</div>
+	<div id="cmover">country</div>
+	<div id="sorter">sort</div>
+	<div id="tmover">temp</div>
+	<div id="nmover"># stud.</div>
+	<div id="tomap">map</div>
+</div>
+
+
+<div id="theNumbers"></div>
+
 <div id="pieHole"> 
    <div id="pieI"></div>
    <div id="pielabelI">water type</div>
@@ -351,25 +363,9 @@ div.tooltip {
    <div id="pielabelII">water source</div>
 </div>
 
-
-<div id="bijbakje"></div>
-<div id="schaalbakje"></div>
-
-<div id="theNumbers"></div>
-
 <div id="histo">
     <div id="histolabel_x">result</div>
     <div id="histolabel_y">frequency</div>
-</div>
-
-<div id="details"><span id="close">click window to close...</span></div>
-
-<div id="buttonBar">
-<div id="mover">move</div>
-<div id="sorter">sort</div>
-<div id="topie">pie</div>
-<div id="tohisto">histo</div>
-<div id="tomap">map</div>
 </div>
 
 
@@ -425,9 +421,6 @@ var c = d3.scale.linear();
 d3.select("#experiments")
   .property("value", "ph_data");
 
-//d3.selectAll("#watertypes, #watersources")
-//  .property("value", "");
-
 
 /**
  *Draw map
@@ -452,7 +445,7 @@ svg.append("g")
  * setup color key holder and gradient
  **/
 var w = 100,
-    h = 17;
+    h = 6;
 
 var bakje = d3.select("#schaalbakje")
 			  .append("svg")
@@ -460,6 +453,8 @@ var bakje = d3.select("#schaalbakje")
 			  .attr("height", h)
 			  .append("svg:g");
 
+			  
+			  
 var gradient = bakje.append("svg:defs")
 					.append("svg:linearGradient")
 					.attr("id", "gradient")
@@ -529,20 +524,6 @@ d3.selectAll("#histolabel_y, #histolabel_x")
   .duration(250)
   .style("opacity", 1);
 
-  
-/**
- * setup country details
- */
-
-var cropw = 50,
-    croph = 50,
-    detw = width / 1.55 - cropw / 5,
-    deth = height / 2 - croph / 3;
-
-var details = d3.select("#details")
-				.append("svg")
-				.attr("width", width/1.5)
-				.attr("height", height/1.9);
 
 /**
  *
@@ -612,8 +593,8 @@ function initMap(data) {
 
 
 /**
- *Draw map
- **/
+*Draw map
+**/
 //d3.json("world-countries.json", function(collection) {
 d3.json("/sites/default/files/sprint/data/world-countries.json", function (collection) {
 
@@ -771,7 +752,7 @@ d3.json("/sites/default/files/sprint/data/gwe_experiment3_v1.json", function(di_
 // refill circles
 
     rondjes = svg.select("#datapoints").selectAll("circle")
-									   .data(data, function(d) { return d; })
+									   .data(data)
 									
 	rondjes.enter().append("circle")
 		.attr('class', 'measurementCircle')
@@ -812,7 +793,7 @@ d3.json("/sites/default/files/sprint/data/gwe_experiment3_v1.json", function(di_
 		   
 //	console.log(rondjes);	   
 						  
-    measurementCircles = svg.select('#datapoints').selectAll('.measurementCircle');
+//    measurementCircles = svg.select('#datapoints').selectAll('.measurementCircle');
 		 
 		 
 		 
@@ -908,10 +889,16 @@ arc = d3.svg.arc().outerRadius(rpie);
 */
 
 
-        d3.selectAll("#expchooser, #schaalbakje, #bijbakje, #buttonBar, #pieHole")
+        d3.selectAll("#expchooser, #bijbakje, #buttonBar, #theNumbers, #pieHole")
           .transition()
-          .delay(50)
-          .duration(250)
+          .delay(100)
+          .duration(666)
+          .style("opacity", .8);
+				
+       d3.selectAll("#schaalbakje")
+          .transition()
+          .delay(100)
+          .duration(666)
           .style("opacity", 1);
 				
 
@@ -1296,97 +1283,92 @@ function updateVisibility() {
 //circlemoving routines
 ///
 
-//need axes and scales!!!
 
-function Movum() {
+
+function TyMovum() {
 
 //console.log(data);
 //console.log(globalfirstVar);
 
-//this should be d3-ified by using scales!!!
-if (globalfirstVar == "ph") {
-data.forEach(function(d,i) { return d.coordinates = [(i/8.4-150),(-35+(d.ph*10))]; });
-}
-else
-if (globalfirstVar == "sanity") {
-data.forEach(function(d,i) { return d.coordinates = [(i/1.6-80),(0+(d.sanity/1.8))]; });
-}
-else
-if (globalfirstVar == "dropsofbleach") {
-data.forEach(function(d,i) { return d.coordinates = [(i-80),(6+d.dropsofbleach)]; });
-}
+data = data.sort(function(d,e) { return d3.ascending(d.waterType, e.waterType); });	   
 
-rondjes.data(data)
-	   .transition()
-	   .delay(function(d,i) { return i })
-	   .duration(5000)
-	   .attr("transform", function (d) { return "translate(" + projection(d.coordinates) + ")"; });
-  
-//why isn´t this working then??
-    rondjes.append("text")
-        .attr("y", function(d) { return d; })
-        .style("fill", "#444")
-        .style("font-size", "8px")
-        .text(function (d) { return d.city; })
-	//	.attr("transform", "translate(0,"+ 100 + ")rotate(-90)")
+circularUpdater();
 
+};	
+
+
+function ScMovum() {
+
+//console.log(data);
+//console.log(globalfirstVar);
+
+data = data.sort(function(d,e) { return d3.ascending(d.waterSource, e.waterSource); });	   
+
+circularUpdater();
 //console.log(rondjes);
 
 };	
-	
+
+
+function TMovum() {
+
+//console.log(data);
+//console.log(globalfirstVar);
+
+data = data.sort(function(d,e) { return d3.ascending(d.temperature, e.temperature); });	   
+
+circularUpdater();
+
+};	
+
+
+function NMovum() {
+
+//console.log(data);
+//console.log(globalfirstVar);
+
+data = data.sort(function(d,e) { return d3.ascending(d.numberofstudents, e.numberofstudents); });	   
+
+circularUpdater();
+
+};	
+
+
+function CMovum() {
+
+//console.log(data);
+//console.log(globalfirstVar);
+
+data = data.sort(function(d,e) { return d3.ascending(d.country, e.country); });	   
+
+circularUpdater();
+
+};	
+
+
 function Sortum() {
 
-//this transition could be better: the dots are not moving to their proper location!!! they move only on the x axis and are recolored and resized
-
-//var dataflex = d3.range(data.length);
+//console.log(dataflex);
 
 //this should be d3-ified by using scales!!!
 if (globalfirstVar == "ph") {
-
-//	dataflex.sort(function(d,e) { return d3.ascending(data[d].ph, data[e].ph); });	   
 	data = data.sort(function(d,e) { return d3.ascending(d.ph, e.ph); });	   
-	data.forEach(function(d,i) { return d.coordinates = [(i/8.4-150),(-30+(d.ph*10))]; });
 }
 else
 if (globalfirstVar == "sanity") {
-//	dataflex.sort(function(d,e) { return d3.ascending(data[d].sanity, data[e].sanity); });	   
 	data = data.sort(function(d,e) { return d3.ascending(d.sanity, e.sanity); });	   
-	data.forEach(function(d,i) { return d.coordinates = [(i/1.6-80),(8+(d.sanity/1.8))]; });
 }
 else
 if (globalfirstVar == "dropsofbleach") {
-//	dataflex.sort(function(d,e) { return d3.ascending(data[d].sanity, data[e].sanity); });	   
 	data = data.sort(function(d,e) { return d3.ascending(d.dropsofbleach, e.dropsofbleach); });	   
-	data.forEach(function(d,i) { return d.coordinates = [(i-80),(14+d.dropsofbleach)]; });
 }
 
-//console.log(rondjes);
-rondjes.data(data)
-		.transition()
-	 //  .delay(30000)
-	   .duration(4000)
-	   .attr("transform", function (d) { return "translate(" + projection(d.coordinates) + ")"; })
-	   .style("fill", function (d) { return c(d[globalfirstVar]); })
-	   .style("stroke", function (d) { return d3.rgb(c(d[globalfirstVar])).darker(); })
-	   .attr("r", function (d) { return r(d[globalsecondVar]); });
+circularUpdater();
   
 };
 	   
 
-function Pieum() {
-//move points to pie coordinates for a transition from rough data to pie data / could be a lot slicker, I guess, see also function Histum 
-
-data.forEach(function(d,i) { return d.coordinates = [100,68]; });
-
-rondjes.data(data)
-	   .transition()
-	 //  .delay(30000)
-	   .duration(4000)
-	   .attr("transform", function (d) { return "translate(" + projection(d.coordinates) + ")"; })
-//	   .style("opacity", 1e-6);
-};
-
-
+	   
 function Histum() {	   
 //move point to histogram coordinates / would be nice if they sorted themselves out on the way over...		
 	
@@ -1420,7 +1402,7 @@ function remaP() {
 //rondjes.data(keptdata)
 //rondjes.data(globalData)
 //rondjes = svg.select("#datapoints").selectAll("circle")
-rondjes.data(globalData)							   
+rondjes.data(globalData, function(d) { return d.school; })							  
 	   .transition()
 	   .delay(4000)
 	   .duration(4000)
@@ -1430,6 +1412,58 @@ rondjes.data(globalData)
 };
 	
 
+function circularUpdater() {
+
+//need axes and scales!!!
+
+//console.log(data);
+//console.log(globalfirstVar);
+
+
+//alternatief voor sort
+//var dataflex = d3.range(data.length);
+//	dataflex.sort(function(d,e) { return d3.ascending(data[d].sanity, data[e].sanity); });	   
+// .attr("transform", function(d, i) { return "translate(" + dataflex.indexOf(i) + ", 0)"; })
+
+
+
+//this should be d3-ified by using scales!!!
+if (globalfirstVar == "ph") {
+data.forEach(function(d,i) { return d.coordinates = [i/8.4-150, d.ph*10-35]; });
+}
+else
+if (globalfirstVar == "sanity") {
+data.forEach(function(d,i) { return d.coordinates = [i/1.6-80, d.sanity/1.8+0]; });
+}
+else
+if (globalfirstVar == "dropsofbleach") {
+data.forEach(function(d,i) { return d.coordinates = [i-80, d.dropsofbleach+6]; });
+}
+
+
+rondjes.data(data, function(d) { return d.coordinates; })
+	   .transition()
+	   .delay(function(d,i) { return i })
+	   .duration(5000)
+	   .attr("transform", function (d) { return "translate(" + projection(d.coordinates) + ")"; });
+	   
+//rondjes.exit().remove();	   
+
+ /* 
+//why isn´t this working then??
+    rondjes.append("text")
+        .attr("y", function(d) { return d; })
+        .style("fill", "#444")
+        .style("font-size", "8px")
+        .text(function (d) { return d.city; })
+	//	.attr("transform", "translate(0,"+ 100 + ")rotate(-90)")
+*/
+//console.log(rondjes);
+
+};	
+	
+	
+	
 
 /**
  * Re-orient visualization when moved
@@ -1453,6 +1487,7 @@ function move() {
 							.attr("r", function (d) { return r(d[globalsecondVar]); })
 
 };
+
 
 
 //rippler - makes rings around the circles; nicked from Jerome Cukier's version 14
@@ -1562,57 +1597,6 @@ function outpath(d) {
 		.attr('fill', '#222');
 }
 
-
-function clover(d) {
-
-    var item = d3.select(this);
-    var city = item.attr("city");
-    var school = item.attr("school");
-    var ph = item.attr("ph");
-    var tph = item.attr("tph");
-	
-    item.transition()
-        .duration(250)
-		.style("fill", function() { return d3.rgb(c(ph)).brighter(); });
-	  
-    tooltipdiv
-            .html('<span class="statlabel">school: </span><span  class="stat">' + school + '</span>' +
-            '<br /><span class="statlabel">city: </span><span  class="stat">' + city + '</span>' +
-            '<br /><span class="statlabel">' + globalfirstVarlabel + ': </span><span  class="stat">' + ph + '</span>' +
-            '<br /><span class="statlabel">' + globalsecondVarlabel + ': </span><span  class="stat">' + tph + '</span>' )
-            .style("background", function () { return c(ph); })
-//            .style("width", "auto")
-            .style("height", "auto")
-            .style("z-index", 9999)
-			
-            .transition()
-            .duration(250)
-            .style("opacity", 1);
-}
-
-function clmove() {
-  
-	tooltipdiv
-            .style("top", d3.event.pageY + 16 + "px")
-            .style("left", d3.event.pageX - 100 + "px");
-}
-
-function clout(d) {
-
-    var item = d3.select(this);
-
-    item.transition()
-        .duration(250)
-        .style("fill", function() { return c(item.attr("ph")); });
-		
-    tooltipdiv
-        .transition()
-        .duration(250)
-        .style("opacity", 1e-6)
-        .style("z-index", -100)
-        .style("width", "200px")
-        .style("height", "90px");
-};
 
 
 /* 
@@ -1915,19 +1899,25 @@ d3.select("#experiments")
   .on("change", updateDataset);
 
 d3.select("#mover")
-  .on("mouseover", Movum);
+  .on("mouseover", circularUpdater);
 
+d3.select("#tymover")
+  .on("mouseover", TyMovum);
+  
+d3.select("#scmover")
+  .on("mouseover", ScMovum);
+
+d3.select("#tmover")
+  .on("mouseover", TMovum);
+  
+d3.select("#nmover")
+  .on("mouseover", NMovum);
+
+d3.select("#cmover")
+  .on("mouseover", CMovum);
+  
 d3.select("#sorter")
   .on("mouseover", Sortum);
-
-
-d3.select("#topie")
-  .on("mouseover", Pieum);
-
-
-d3.select("#tohisto")
-  .on("mouseover", Histum);
-
 
 d3.select("#tomap")
   .on("mouseover", Mapum);
