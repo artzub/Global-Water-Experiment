@@ -441,6 +441,7 @@ var g = svg.append("g"),
 svg.append("g")
    .attr("id", "datapoints");
 
+   
 /**
  * setup color key holder and gradient
  **/
@@ -695,8 +696,7 @@ d3.json("/sites/default/files/sprint/data/gwe_experiment3_v1.json", function(di_
 		 
 		 
 //filter out two specific data entry errors / this is done by filtering on salinity by weight, this is the 'secondVar'!
-        if (firstVar == "sanity") { data = sa_data.filter(function (d) { return d[secondVar] < 24; });
-        }
+        if (firstVar == "sanity") { data = sa_data.filter(function (d) { return d[secondVar] < 24; }); }
 		
 //resason to take out these two measurements:
     //{"city":"Milano","coordinates":[9.18103,45.468945],"country":"Italy","natureofthewater":"fresh","numberofstudents":19,"sanity":0.24,"sanitybyweight":24,"school":"Facoltà di Agraria-Università degli studi di Milano","sourceofwater":"Casalmaiocco (LO), tapwater","teacher":"Gigliola","waterType":"fresh","waterSource":"tap"},
@@ -748,11 +748,13 @@ d3.json("/sites/default/files/sprint/data/gwe_experiment3_v1.json", function(di_
         c.domain([d3.min(data, function (d) { return d[firstVar]; }), gemfirstVar, d3.max(data, function (d) { return d[firstVar];
         })])
          .range([lowColor, midColor, highColor]);
+
+
 		 
 // refill circles
 
     rondjes = svg.select("#datapoints").selectAll("circle")
-									   .data(data)
+									   .data(data, function(d) { return d.coordinates; })
 									
 	rondjes.enter().append("circle")
 		.attr('class', 'measurementCircle')
@@ -1287,9 +1289,6 @@ function updateVisibility() {
 
 function TyMovum() {
 
-//console.log(data);
-//console.log(globalfirstVar);
-
 data = data.sort(function(d,e) { return d3.ascending(d.waterType, e.waterType); });	   
 
 circularUpdater();
@@ -1299,21 +1298,14 @@ circularUpdater();
 
 function ScMovum() {
 
-//console.log(data);
-//console.log(globalfirstVar);
-
 data = data.sort(function(d,e) { return d3.ascending(d.waterSource, e.waterSource); });	   
 
 circularUpdater();
-//console.log(rondjes);
 
 };	
 
 
 function TMovum() {
-
-//console.log(data);
-//console.log(globalfirstVar);
 
 data = data.sort(function(d,e) { return d3.ascending(d.temperature, e.temperature); });	   
 
@@ -1324,9 +1316,6 @@ circularUpdater();
 
 function NMovum() {
 
-//console.log(data);
-//console.log(globalfirstVar);
-
 data = data.sort(function(d,e) { return d3.ascending(d.numberofstudents, e.numberofstudents); });	   
 
 circularUpdater();
@@ -1336,9 +1325,6 @@ circularUpdater();
 
 function CMovum() {
 
-//console.log(data);
-//console.log(globalfirstVar);
-
 data = data.sort(function(d,e) { return d3.ascending(d.country, e.country); });	   
 
 circularUpdater();
@@ -1347,8 +1333,6 @@ circularUpdater();
 
 
 function Sortum() {
-
-//console.log(dataflex);
 
 //this should be d3-ified by using scales!!!
 if (globalfirstVar == "ph") {
@@ -1429,7 +1413,7 @@ function circularUpdater() {
 
 //this should be d3-ified by using scales!!!
 if (globalfirstVar == "ph") {
-data.forEach(function(d,i) { return d.coordinates = [i/8.4-150, d.ph*10-35]; });
+data.forEach(function(d,i) { return d.coordinates = [i/9.1-130, d.ph*10-35]; });
 }
 else
 if (globalfirstVar == "sanity") {
@@ -1447,18 +1431,6 @@ rondjes.data(data, function(d) { return d.coordinates; })
 	   .duration(5000)
 	   .attr("transform", function (d) { return "translate(" + projection(d.coordinates) + ")"; });
 	   
-//rondjes.exit().remove();	   
-
- /* 
-//why isn´t this working then??
-    rondjes.append("text")
-        .attr("y", function(d) { return d; })
-        .style("fill", "#444")
-        .style("font-size", "8px")
-        .text(function (d) { return d.city; })
-	//	.attr("transform", "translate(0,"+ 100 + ")rotate(-90)")
-*/
-//console.log(rondjes);
 
 };	
 	
@@ -1898,9 +1870,11 @@ function closeMe() {
 d3.select("#experiments")
   .on("change", updateDataset);
 
+  
 d3.select("#mover")
   .on("mouseover", circularUpdater);
 
+  
 d3.select("#tymover")
   .on("mouseover", TyMovum);
   
