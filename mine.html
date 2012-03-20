@@ -56,14 +56,14 @@ line, .tikkies {
 #subheader {
     position: absolute;
     top: 25px;
-    left: 498px;
+    left: 502px;
     padding: 0px;
     margin: 0px;
     font: italic 24px 'Times New Roman';
     z-index: 11;
 }
 
-#detailscont, #experiments, #watertypes, #watersources, #schaalbakje, div.tooltip {
+#detailscont, #experiments, #watertypes, #watersources, #schaalbakje > svg, div.tooltip {
     border: 1px solid #5D5D5D;
     border-radius: 3px;
     -moz-border-radius: 3px;
@@ -71,6 +71,15 @@ line, .tikkies {
     box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5);
     -moz-box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5);
     -webkit-box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5);
+}
+
+.arc {
+    cursor : pointer;
+}
+
+.arcsel {
+    stroke: rgba(255, 128, 0, 0.8);
+    stroke-width: 2px;
 }
 
 #map {
@@ -81,8 +90,8 @@ line, .tikkies {
 
 #choosers {
     position: absolute;
-    top: 15px;
-    left: 248px;
+    top: 13px;
+    left: 71px;
     z-index: 100;
     opacity: 0;
 }
@@ -94,20 +103,21 @@ line, .tikkies {
     height: 20px;
 }
 
-#chooseII {
-    left: 0px;
-}
-
-#chooseII {
-    left: 200px;
+#chooseII, #chooseIII {
+    top: 72px;
+    left: -5px;
 }
 
 #chooseIII {
-    left: 340px;
+    left: 78px;
+}
+
+#watertypes, #watersources {
+    display: none;
 }
 
 #chooseAxisX, #chooseAxisY {
-    left: 8px;
+    left: 26px;
     top: 264px;
     display: none;
     z-index: 9006;
@@ -123,26 +133,27 @@ line, .tikkies {
     font-size: 90%;
 }
 
-#bijbakje {
+#gradcont {
     position: absolute;
-    top: 18px;
-    left: 15px;
-    width: 100px;
+    top: 105px;
+    left: 24px;
+    width: 220px;
+}
+
+#bijbakje {
+    overflow: hidden;
+    padding: 0 8px 0 0;
     text-align: right;
-    opacity: 0;
+    float: left;
 }
 
 #schaalbakje {
-    position: absolute;
-    top: 15px;
-    left: 119px;
-    opacity: 0;
 }
 
 #theNumbers {
     position: absolute;
-    left: 8px;
-    top: 92px;
+    left: -10px;
+    top: 39px;
     width: 220px;
     text-align: right;
     z-index: 10;
@@ -150,8 +161,8 @@ line, .tikkies {
 
 #pieHole {
     position: absolute;
-    top: 26px;
-    left: 457px;
+    top: -6px;
+    left: 759px;
     width: 200px;
     opacity: 0;
     z-index: 10000;
@@ -163,7 +174,7 @@ line, .tikkies {
 }
 
 #pieII {
-    left: 145px;
+    left: 88px;
 }
 
 #histo {
@@ -190,7 +201,7 @@ line, .tikkies {
 #source {
     position: absolute;
     bottom: 6px;
-    left: 390px;
+    left: 395px;
 }
 
 div.tooltip {
@@ -269,8 +280,8 @@ div.tooltip {
 
 #checkBoxList {
     position: absolute;
-    top: 158px;
-    left: 8px;
+    top: 135px;
+    left: 74px;
     z-index: 9005;
     display: none;
     border: 1px dotted #888;
@@ -326,7 +337,7 @@ line, .tikkies {
 #subheader {
     color: #009DDC; /*colors used on http://water.chemistry2011.org/web/iyc: #B5F0FF; #009DDC */
 }
-#detailscont, #experiments, #watertypes, #watersources, #schaalbakje, div.tooltip {
+#detailscont, #experiments, #watertypes, #watersources, #schaalbakje > svg, div.tooltip {
     border-color: #5D5D5D;
 }
 #map {
@@ -354,6 +365,12 @@ div.tooltip {
 #details .astxt, #details .bartxt {
     fill: #000;
 }
+
+#details .axisXBar, #details .axisYBar {
+    fill : #5D5DE9;
+    font-size : 8px;
+}
+
 #close {
     color: black;
     border-color: black;
@@ -393,7 +410,9 @@ div.tooltip {
             <!--		<option value="gwe_experiment4_v1">4: still</option> -->
         </select>
     </div>
+</div>
 
+<div id="pieHole">
     <div id="chooseII">
         <label for="watertypes">water types</label>
         <select id="watertypes">
@@ -418,18 +437,14 @@ div.tooltip {
             <option value="unknown">unknown</option>
         </select>
     </div>
-
-</div>
-
-
-<div id="pieHole">
     <div id="pieI"></div>
     <div id="pieII"></div>
 </div>
 
-
-<div id="bijbakje"></div>
-<div id="schaalbakje"></div>
+<div id="gradcont">
+    <div id="bijbakje"></div>
+    <div id="schaalbakje"></div>
+</div>
 
 <div id="theNumbers"></div>
 
@@ -447,24 +462,27 @@ div.tooltip {
 <div id="checkBoxList">
     <span class="stat">Options:</span><br />
     <input type="checkbox" checked="checked" id="axisxbar"/>
-    <label for="axisxbar">Names of axis X</label>
+    <label for="axisxbar">Names of x-axis</label>
     <br />
     <input type="checkbox" checked="checked" id="axisxbarline"/>
-    <label for="axisxbarline">Lines of axis X</label>
+    <label for="axisxbarline">Lines of x-axis</label>
     <br />
     <input type="checkbox" checked="checked" id="axisybar"/>
-    <label for="axisybar">Names of axis Y</label>
+    <label for="axisybar">Names of y-axis</label>
     <br />
     <input type="checkbox" checked="checked" id="axisybarline"/>
-    <label for="axisybarline">Lines of axis Y</label>
+    <label for="axisybarline">Lines of y-axis</label>
+    <br />
+    <input type="checkbox" id="showalldata"/>
+    <label for="showalldata">View all data</label>
 </div>
 
 <div id="chooseAxisX">
-   <label for="axisx">Axis X:</label>
+   <label for="axisx">X-axis:</label>
    <select id="axisx"><option value="tap">tap</option></select>
 </div>
 <div id="chooseAxisY">
-   <label for="axisy">Axis Y:</label>
+   <label for="axisy">Y-axis:</label>
    <select id="axisy"><option value="tap">tap</option></select>
 </div>
 
@@ -478,7 +496,7 @@ div.tooltip {
 var activeDataset;
 
 //needed for radius consistency during zooms and for updates
-var reeks, globalData, globalfirstVar, globalsecondVar, globalfirstVarlabel, globalsecondVarlabel;
+var reeks, globalfirstVar, globalsecondVar, globalfirstVarlabel, globalsecondVarlabel;
 var measurementCircles, detailsCircles = null;
 
 var margin = {top:0, right:0, bottom:0, left:0},
@@ -517,9 +535,10 @@ var cs = {
         }
     },
     expI : {
-        low : "red",
-        mid : "green",
-        high : "blue"
+        //"#CC0033", "#33FF33", "#3333CC"
+        low : "#CC0033",
+        mid : "#33FF33",
+        high : "#3333CC"
     },
     expII : {
         low : "green",
@@ -553,7 +572,7 @@ d3.selectAll("#watertypes, #watersources")
 /**
  *Draw map
  **/
-var svg = d3.select("#map").style("background", cs.map.background)
+var svg = d3.select("#map").style("background-color", cs.map.background)
         .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
@@ -570,8 +589,8 @@ svg.append("g").attr("id", "datapoints");
 /**
  * setup color key holder and gradient
  **/
-var w = 100,
-    h = 17;
+var w = 160,
+    h = 12;
 
 var bakje = d3.select("#schaalbakje")
         .append("svg")
@@ -595,7 +614,9 @@ var wpie = 50,
     hpie = 50,
     rpie = Math.min(wpie, hpie) / 2,
     typecolor = d3.scale.ordinal().range(["deepskyblue", "aquamarine", "lightgrey"]),
-    sourcecolor = d3.scale.ordinal().range(["#7B86EF", "#6371ED", "#4E5EEA", "#283BE6", "#1A2DDA", "#1729C5", "#13219F", "#0D176D", "lightgrey"]);
+    sourcecolor = d3.scale.ordinal().range(["#7B86EF", "#6371ED", "#4E5EEA", "#283BE6", "#1A2DDA", "#1729C5", "#13219F", "#0D176D", "lightgrey"]),
+    selectedArcI = null,
+    selectedArcII = null;
 
 /**
  * setup histogram
@@ -682,6 +703,7 @@ details.append("line")
  */
 
 var lastData = null;
+var dataMap = null;
 var workArr = null;
 var selectedPath = null;
 var axisNames = {};
@@ -712,39 +734,672 @@ var replaceCountry = {
   "Scotland":"United Kingdom"
 }
 
-/* If only the UNESCO had used the official UN abreviations... ;) */
-function initDataCountries(data) {
-    lastData = {};
-    for (var i = 0; i < data.length; i++) {
-        var d = data[i];
-        var ccn = replaceCountry[d.country] || d.country;
+var axbl = true;
+var axb = true;
+var aybl = true;
+var ayb = true;
 
-        if (!isExists(lastData[ccn]))
-            lastData[ccn] = [];
+tooltipdiv = d3.select("body")
+        .append("div")
+        .attr("class", "tooltip")
+        ;
 
-        if (globalfirstVar == "sanity"&&
-            d[globalsecondVar] >= 24)
-            continue;
+function tooltipper(d) {
+    tooltipdiv
+            .html("<span class=\"statlabel\">" +
+                  globalfirstVarlabel + " </span><span class=\"stat\">" +
+                  d[globalfirstVar] + "</span><br/><span class=\"statlabel\">" +
+                  globalsecondVarlabel + ": </span><span class=\"stat\">" +
+                  d[globalsecondVar] + "</span><br/><span class=\"stat\">" +
+                  d.waterType + "</span><span class=\"statlabel\"> water</span><br/><span class=\"statlabel\">source: </span><span class=\"stat\">" +
+                  d.waterSource + "</span><br/><br/><span class=\"schoollabel\">(" +
+                  d.school + ", " +
+                  d.country + ")</span>")
+            .style("background", c(d[globalfirstVar]))
+            .style("z-index", 100)
 
-        if (globalfirstVar == "dropsofbleach" &&
-            d[globalfirstVar] >= 799)
-            continue;
-
-        lastData[ccn].push(d);
-    }
-    initSelecters();
+            .transition()
+            .duration(250)
+            .style("opacity", 1)
+            ;
 }
 
+function toolmover() {
+    tooltipdiv
+            .style("top", d3.event.pageY > height / 2 ? (d3.event.pageY - 102) + "px" : (d3.event.pageY + 12) + "px")
+            .style("left", d3.event.pageX > width / 2 ? (d3.event.pageX - 212) + "px" : (d3.event.pageX + 12) + "px")
+            ;
+}
+
+function tooltapper() {
+    tooltipdiv
+            .transition()
+            .duration(250)
+            .style("opacity", 1e-6)
+            .style("z-index", -100)
+            ;
+}
+
+/**
+ * Draw map
+ */
+d3.json("/sites/default/files/sprint/data/world-countries.json", function (collection) {
+    feature = feature.data(collection.features)
+            .enter().append("path")
+            .attr("class", "feature")
+            .attr("d", path)
+            .style('fill', cs.map.feature.fill)
+            .style('stroke', cs.map.feature.stroke)
+            .on("mouseover", overpath)
+            .on("mousemove", moverpath)
+            .on("click", clickPath)
+            .on("mouseout", outpath)
+            ;
+
+    loadData();
+});
+
+function loadData() {
+    dataMap = {};
+
+    initData = function(d, i) {
+        var item = d3.select(this);
+        var dataset = item.attr("value");
+        d3.json("/sites/default/files/sprint/data/" + dataset + ".json", function (data) {
+            var filterfun = dataset == "gwe_experiment1_v1"
+                            ?   function (d) { return d["ph"] >= 5; }
+                            :   dataset == "gwe_experiment2_v1"
+                                ?   function (d) { return d["sanitybyweight"] < 24; }
+                                :   dataset == "gwe_experiment3_v1"
+                                    ?   function (d) { return d["dropsofbleach"] < 799; }
+                                    :   function (d) { return true; };
+
+            data = data.filter(filterfun);
+
+            var dataCountries = d3.nest()
+                    .key(function(d) { return replaceCountry[d.country] || d.country; })
+                    .map(data);
+            dataMap[dataset] = { source : data, countries : dataCountries };
+            item.style("visibility", null);
+            if (dataset == "gwe_experiment1_v1")
+                setTimeout(function() {updateDataset();}, 500);
+        });
+    };
+
+    d3.select("#experiments").selectAll("option").style("visibility", "hidden").each(initData);
+}
+
+function updateDataset() {
+
+    var picker = d3.select("#experiments").property("value");
+
+    if (activeDataset == picker)
+        return;
+    else
+        activeDataset = picker;
+
+    switch(picker) {
+        case "gwe_experiment1_v1" :
+            swap_to_Exp(cs.expI.low, cs.expI.mid, cs.expI.high,
+                    "pH", "ph", "temperature (in \u00b0C)", "temperature");
+            break;
+        case "gwe_experiment2_v1" :
+            swap_to_Exp(cs.expII.low, cs.expII.mid, cs.expII.high,
+                    "salinity ", "sanity", "salinity by weight", "sanitybyweight");
+            break;
+        case "gwe_experiment3_v1" :
+            swap_to_Exp(cs.expIII.low, cs.expIII.mid, cs.expIII.high,
+                    "drops of bleach", "dropsofbleach", "temperature (in \u00b0C)", "temperature");
+            break;
+    }
+}
+
+function swap_to_Exp(lowColor, midColor, highColor, firstVarlabel, firstVar, secondVarlabel, secondVar) {
+
+    globalfirstVar = firstVar;
+    globalsecondVar = secondVar;
+    globalfirstVarlabel = firstVarlabel;
+    globalsecondVarlabel = secondVarlabel;
+
+    if (!isExists(dataMap) || !isExists(dataMap[activeDataset]))
+        return;
+
+    var data = dataMap[activeDataset].source;
+
+    gemfirstVar = d3.round(d3.mean(data, function (d) {
+        return d[firstVar];
+    }), 2);
+
+    gemsecondVar = d3.round(d3.mean(data, function (d) {
+        return d[secondVar];
+    }), 2);
+
+    reeks = data.map(function (d) {
+        return d[firstVar];
+    });
+
+    lastData = dataMap[activeDataset].countries;
+    initSelecters();
+
+    // scale for temperature to radius
+    r.domain(d3.extent(data.map(function (d) {
+        return d[secondVar];
+    })))
+            .range([1 * (q / width), 6 * (q / width)]);
+
+    // scale for ph to color
+    // using a manually-set low value because an extreme sample is distorting the range
+    c.domain([
+        d3.min(data, function (d) {
+            return d[firstVar];
+        }),
+        gemfirstVar,
+        d3.max(data, function (d) {
+            return d[firstVar];
+        })
+    ]).range([lowColor, midColor, highColor]);
+
+    //gather data for pies
+    //this can also be done with d3.nest to extract the variables and their lenghts, but that messes up the order of the watertypes and sources
+
+    types = [];
+    sources = [];
+
+    types.push({ "type":"fresh", "size":data.filter(
+            function (d) {
+                return d.waterType == "fresh";
+            }).length });
+    types.push({ "type":"salt", "size":data.filter(
+            function (d) {
+                return d.waterType == "salt";
+            }).length });
+    types.push({ "type":"unknown", "size":data.filter(
+            function (d) {
+                return d.waterType == "unknown";
+            }).length });
+
+    sources.push({ "source":"tap", "size":data.filter(
+            function (d) {
+                return d.waterSource == "tap";
+            }).length });
+    sources.push({ "source":"drinking supply", "size":data.filter(
+            function (d) {
+                return d.waterSource == "drinking supply";
+            }).length });
+    sources.push({ "source":"ground", "size":data.filter(
+            function (d) {
+                return d.waterSource == "ground";
+            }).length });
+    sources.push({ "source":"rain", "size":data.filter(
+            function (d) {
+                return d.waterSource == "rain";
+            }).length });
+    sources.push({ "source":"stream, river, canal", "size":data.filter(
+            function (d) {
+                return d.waterSource == "stream, river, canal";
+            }).length });
+    sources.push({ "source":"pond, lake, pool", "size":data.filter(
+            function (d) {
+                return d.waterSource == "pond, lake, pool";
+            }).length });
+    sources.push({ "source":"ocean", "size":data.filter(
+            function (d) {
+                return d.waterSource == "ocean";
+            }).length });
+    sources.push({ "source":"waste water", "size":data.filter(
+            function (d) {
+                return d.waterSource == "waste water";
+            }).length });
+    sources.push({ "source":"unknown", "size":data.filter(
+            function (d) {
+                return d.waterSource == "unknown";
+            }).length });
+
+
+    donut = d3.layout.pie().sort(null).value(function (d) {
+        return d.size;
+    });
+
+    arc = d3.svg.arc().outerRadius(rpie);
+
+    d3.selectAll("#watertypes , #watersources")
+        .on("change", null);
+
+    /**
+     *Gradient legend for pH values / needs tickmarks
+     **/
+    gradient.selectAll("stop").remove();
+
+    gradient.append("svg:stop")
+            .attr("offset", "0%")
+            .attr("stop-color", lowColor)
+            .attr("stop-opacity", 1)
+            ;
+
+    gradient.append("svg:stop")
+            .attr("offset", "50%")
+            .attr("stop-color", midColor)
+            .attr("stop-opacity", 1)
+            ;
+
+    gradient.append("svg:stop")
+            .attr("offset", "100%")
+            .attr("stop-color", highColor)
+            .attr("stop-opacity", 1)
+            ;
+
+    bakje.selectAll("rect").remove();
+    bakje.append("rect")
+            .attr("width", w)
+            .attr("height", h)
+            .attr("rx", "4px")
+            .attr("ry", "4px")
+            .style("fill", "url(#gradient)")
+            ;
+
+    var minVar = d3.min(data, function (d) { return d[firstVar]; });
+    var maxVar = d3.max(data, function (d) { return d[firstVar]; });
+    bakje.selectAll("text").remove();
+    bakje.append("text")
+            .attr("class", "stat")
+            .attr("x", 2)
+            .attr("y", 9.5)
+            .style('fill', midColor)
+            .text(minVar)
+            ;
+    bakje.append("text")
+            .attr("class", "stat")
+            .attr("x", w - (maxVar.toString().length * 8))
+            .attr("y", 9.5)
+            .style('fill', midColor)
+            .text(maxVar)
+            ;
+
+    d3.select("#bijbakje").text(firstVarlabel);
+
+    d3.selectAll("#choosers, #schaalbakje, #bijbakje, #pieHole")
+            .transition()
+            .delay(50)
+            .duration(250)
+            .style("opacity", 1)
+            ;
+
+    //the pies could me made a lot slicker by using proper updates (with tweens) instead of remove/appends
+
+    //the pies could replace the current drop downs for waterType and waterSource
+
+    d3.selectAll("#pieI, #pieII").select("svg").remove();
+
+    var visI = d3.select("#pieI")
+            .append("svg")
+            .data([types])
+            .attr("width", wpie+5)
+            .attr("height", hpie+5)
+            ;
+
+    var arcsI = visI.selectAll("g.arc")
+            .data(donut)
+            .enter().append("svg:g")
+            .on("mouseover", arcover)
+            .on("mouseout", arcout)
+            .on("click", function(d) {
+                var item = d3.select(this);
+                var reselect = true;
+                if (isExists(selectedArcI)) {
+                    reselect = selectedArcI.attr("id") != item.attr("id");
+                    selectedArcI.attr("class", "arc");
+                    selectedArcI = null;
+                }
+                if(reselect) {
+                    item.attr("class", "arc arcsel");
+                    selectedArcI = item;
+                }
+                setTimeout(function(){updateVisibility();}, 100);
+            })
+            .attr("class", "arc")
+            .attr('id', function (d, i) { return 'pieSliceI-' + i; })
+            .attr("transform", "translate(" + rpie + "," + rpie + ")")
+            ;
+
+    arcsI.append("path")
+            .attr("fill", function (d, i) {
+                return typecolor(i);
+            })
+            .attr("d", arc)
+            ;
+
+    arcsI.append("title")
+            .text(function (d) {
+                return d.data.type + ": " + d.data.size;
+            });
+
+
+    var visII = d3.select("#pieII")
+            .append("svg")
+            .data([sources])
+            .attr("width", wpie+5)
+            .attr("height", hpie+5)
+            ;
+
+    var arcsII = visII.selectAll("g.arc")
+            .data(donut)
+            .enter().append("svg:g")
+            .on("mouseover", arcover)
+            .on("mouseout", arcout)
+            .on("click", function(d) {
+                var item = d3.select(this);
+                var reselect = true;
+                if (isExists(selectedArcII)) {
+                    reselect = selectedArcII.attr("id") != item.attr("id");
+                    selectedArcII.attr("class", "arc");
+                    selectedArcII = null;
+                }
+                if (reselect) {
+                    item.attr("class", "arc arcsel");
+                    selectedArcII = item;
+                }
+                setTimeout(function(){updateVisibility();}, 100);
+            })
+            .attr("class", "arc")
+            .attr('id', function (d, i) { return 'pieSliceII-' + i; })
+            .attr("transform", "translate(" + rpie + "," + rpie + ")")
+            ;
+
+    arcsII.append("path")
+            .attr("fill", function (d, i) {
+                return sourcecolor(i);
+            })
+            .attr("stroke", function (d, i) {
+                return d3.rgb(sourcecolor(i)).darker;
+            })
+            .attr("d", arc)
+            ;
+
+    arcsII.append("title")
+            .text(function (d) {
+                return d.data.source + ": " + d.data.size;
+            });
+
+    // refill circles
+    svg.select("#datapoints")
+            .selectAll("circle")
+            .transition()
+            .duration(1000)
+            .remove()
+            ;
+
+    svg.select("#datapoints")
+            .selectAll("circle.node")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr('class', 'measurementCircle')
+            .attr("transform", function (d) {
+                return "translate(" + projection(d.coordinates) + ")";
+            })
+            .attr("r", 0)
+            .attr("fill", "#aaa")
+            .on("mouseover", tooltipper)
+            .on("mousemove", toolmover)
+            .on("mouseout", tooltapper)
+            .on("click", ripple)
+            .style("visibility", function(d) {
+                var watertype = isExists(selectedArcI) ? selectedArcI.datum().data.type || "" : "";
+                var watersource = isExists(selectedArcII) ? selectedArcII.datum().data.source || "" : "";
+                return  (watertype == "" || watertype == d.waterType)
+                        && (watersource == "" || watersource == d.waterSource)
+                        ?   "visible"
+                        :   "hidden"
+                        ;
+            })
+
+            .transition()
+            .delay(100)
+            .duration(1000)
+            .attr("r", function (d) {
+                return r(d[secondVar]);
+            })
+
+            .transition()
+            .delay(1200)
+            .duration(1250)
+            .attr("fill", function (d) {
+                return c(d[firstVar]);
+            })
+            .attr("stroke", function (d) {
+                return d3.rgb(c(d[firstVar])).darker();
+            });
+
+    measurementCircles = svg.select('#datapoints').selectAll('.measurementCircle');
+
+    //this is a lot of html within the code
+    d3.select("#theNumbers")
+            .html("<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" +
+                  reeks.length + "</span><br/><br/><span class=\"statlabel\">average " +
+                  firstVarlabel + " </span><span class=\"stat\">" +
+                  gemfirstVar + "</span><br/><span class=\"statlabel\">average " +
+                  secondVarlabel + ": </span><span class=\"stat\">" +
+                  gemsecondVar + "</span>");
+
+    //This is quite a lot of html code inside the d3 code - isn't there a better way to do this?
+    //The school names vary considerably in length. So sometimes they leave a lot of white space in the div, and at other times they stick out at the bottom - resolved for now because by means of a small fontsize
+    //Is it possible to have the tooltip divs automatically size according to their contents?
+
+    d3.selectAll("#watertypes , #watersources")
+            .property("value", "");
+
+    updateData();
+
+    d3.selectAll("#watertypes, #watersources").on("change", updateVisibility);
+}
+
+function updateData() {
+    if (selectedPath != null) {
+        workArr = getCountryTempr(lastData, selectedPath.datum().properties.name);
+
+        doHistogram(workArr.map(function (d) {
+                return d[globalfirstVar];
+            }));
+
+        changeAxis();
+    }
+    else
+        doHistogram();
+}
+
+
+function doHistogram(reeks) {
+
+    //histogramcode
+
+    if (!isExists(reeks))
+        reeks = window.reeks;
+
+    d3.select("#histo").selectAll(".grid, .tikkies, .hisrect, text")
+            .transition()
+            .duration(500)
+            .style("opacity", 1e-6)
+            .remove()
+            ;
+
+    var histogram = d3.layout.histogram()(reeks);
+
+    var x = d3.scale.ordinal()
+            .domain(histogram.map(function (d) {
+                return d.x;
+            }))
+            .rangeBands([0, histw])
+            ;
+
+    var y = d3.scale.linear()
+            .domain([0, d3.max(histogram, function (d) {
+                return d.y;
+            })])
+            .range([0, histh])
+            ;
+
+    var rules = his.selectAll("g.rule")
+            .data(y.ticks(10))
+            .enter()
+            .append("svg:g")
+            .attr("transform", function (d) {
+                return "translate(0," + (histh - y(d)) + ")";
+            })
+            .style("opacity", 1e-6)
+            ;
+
+    rules.append("line")
+            .attr("class", "tikkies")
+            .attr("x1", -1)
+            .attr("x2", -5)
+            ;
+
+    rules.append("line")
+            .attr("class", "grid")
+            .attr("x1", 1)
+            .attr("x2", histw)
+            ;
+
+    rules.append("text")
+            .attr("class", "astxt")
+            .attr("x", -15)
+            .attr("dy", ".4em")
+            .attr("text-anchor", "middle")
+            .style("display", function (d) {
+                return d == 0 ? "none" : null
+            })
+            .text(y.tickFormat(10))
+            ;
+
+    rules.transition()
+            .delay(4000)
+            .duration(250)
+            .style("opacity", 1)
+            ;
+
+    var bars = his.selectAll("g.bars")
+            .data(histogram)
+            .enter().append("svg:g")
+            .attr('class', 'histoBar')
+            .attr('id', function (d, i) {
+                return 'histoBar-' + i;
+            })
+            .attr("transform", function (d) {
+                return "translate(" + x(d.x) + "," + (histh - y(d.y)) + ")";
+            })
+            .on('mouseover', markHistogramBar)
+            .on('mouseout', unmarkHistogramBar)
+            ;
+
+    bars.append("rect")
+            .attr("class", "hisrect")
+            .attr("width", x.rangeBand())
+            .attr("y", function (d) {
+                return y(d.y);
+            })
+            .attr("height", 0)
+            .style("fill", function (d) {
+                return c(d.x);
+            })
+            .style("stroke", function (d) {
+                return d3.rgb(c(d.x)).darker();
+            })
+
+            .transition()
+            .delay(2450)
+            .duration(750)
+            .attr("height", function (d) {
+                return y(d.y);
+            })
+            .attr("y", 0)
+            ;
+
+    bars.append("text")
+            .attr("class", "bartxt")
+            .attr("x", x.rangeBand() / 2)
+            .attr("y", 0)
+            .attr("dy", "-.35em")
+            .attr("text-anchor", "middle")
+            .text(function (d) {
+                return d3.round(d.x, 1)
+            })
+            .style("opacity", 1e-6)
+
+            .transition()
+            .delay(3250)
+            .duration(750)
+            .style("opacity", 1)
+            ;
+}
+
+
+function markHistogramBar(d, i) {
+
+    // make all bars, except the hovered bar, semi transparent
+    var selectedBarId = 'histoBar-' + i;
+    his.selectAll('.histoBar')
+            .transition()
+            .duration(300)
+            .style('opacity', function (d, i) {
+                return ( d3.select(this).attr('id') != selectedBarId ) ? 0.3 : 1
+            });
+
+    highlightMeasurements(globalfirstVar, d.x, d.x + d.dx);
+}
+
+function unmarkHistogramBar(d, i) {
+
+    // remove transparency from all bars
+    his.selectAll('.histoBar').transition()
+            .duration(300)
+            .style('opacity', 1);
+
+    highlightMeasurements(null);
+
+}
+
+function highlightMeasurements(metric, lowerBound, upperBound) {
+
+    if (highlightTimer != null) {
+        clearTimeout(highlightTimer);
+    }
+
+    var watertype = isExists(selectedArcI) ? selectedArcI.datum().data.type || "" : "";
+    var watersource = isExists(selectedArcII) ? selectedArcII.datum().data.source || "" : "";
+
+    highlightTimer = setTimeout(function () {
+
+        var needObj = measurementCircles;
+        if (isExists(detailsCircles))
+            needObj = detailsCircles;
+
+        needObj.style('visibility', function (d, i) {
+
+            if (( ( metric == null ) || ( d[ metric ] >= lowerBound && d[ metric ] <= upperBound ) ) &&
+                    (watertype == "" || watertype == d.waterType) && (watersource == "" || watersource == d.waterSource)) {
+                return null;
+            }
+            else {
+                return 'hidden';
+            }
+        });
+    }, 350);
+}
+
+
+/**
+ * Details
+ */
 function getCountryTempr(coll, name) {
 
-    var watertype = d3.select("#watertypes").property("value");
-    var watersource = d3.select("#watersources").property("value");
+    var watertype = isExists(selectedArcI) ? selectedArcI.datum().data.type || "" : "";
+    var watersource = isExists(selectedArcII) ? selectedArcII.datum().data.source || "" : "";
 
     var arr = [];
 
     if (isExists(coll[name])) {
         var arr = coll[name].filter(function (d) {
-            return (watertype == "" || d.waterType == watertype) && watersource == "" || d.waterSource == watersource;
+            return (watertype == "" || d.waterType == watertype) && (watersource == "" || d.waterSource == watersource);
         });
     }
     return arr;
@@ -797,22 +1452,100 @@ function outpath(d) {
             ;
 }
 
+function arcover(d, i) {
+
+    var item = d3.select(this);
+    var selectedPieId = item.attr("id");
+
+    d3.select(this.parentNode).selectAll('.arc')
+	   .transition()
+       .duration(300)
+       .style('opacity', function (d, i) {
+            return ( d3.select(this).attr('id') != selectedPieId ) ? 0.6 : 1;
+       });
+};
+
+function arcout(d, i) {
+
+    if (d3.select(this) == selectedArcI || d3.select(this) == selectedArcII)
+        return;
+
+    d3.select(this.parentNode).selectAll('.arc')
+	   .transition()
+       .duration(300)
+	   .style("opacity", 1);
+}
+
+function dtover(d){
+    d3.selectAll(".textdet_" +
+                d[d3.select("#axisx").property("value")].toString().replace(/[\s\.,]/g, "") + ", .textdety_" +
+                d[d3.select("#axisy").property("value")].toString().replace(/[\s\.,]/g, "")
+            )
+            .selectAll("text")
+            .style("fill", function() { return d3.rgb(d3.select(this).style("fill")).darker(); })
+            .transition()
+            .duration(300)
+            .style("font-size", "11px")
+            .style("font-weight", "bold")
+            ;
+}
+
+function dtout(d){
+    d3.selectAll(".textdet_" +
+                    d[d3.select("#axisx").property("value")].toString().replace(/[\s\.,]/g, "") + ", .textdety_" +
+                    d[d3.select("#axisy").property("value")].toString().replace(/[\s\.,]/g, "")
+                )
+            .selectAll("text")
+            .style("fill", function() {
+                return d3.rgb(d3.select(this).style("fill")).brighter();
+            })
+            .transition()
+            .duration(300)
+            .style("font-weight", null)
+            .style("font-size", "8px")
+            ;
+}
+
 function clover(d) {
     var item = d3.select(this);
-    var city = item.attr("city");
-    var school = item.attr("school");
-    var ph = item.attr("ph");
-    var tph = item.attr("tph");
+    var child = item.attr("child");
+    var city = d["city"];
+    var school = d["school"];
+    var ph = d[globalfirstVar];
+    var tph = d[globalsecondVar];
     item.transition()
             .duration(250)
             .style("fill", d3.rgb(c(ph)).brighter())
             ;
+    var axisx = d3.select("#axisx").property("value");
+
+    if (!d3.select("#showalldata").property("checked"))
+        item.style("cursor", "pointer");
+
+    if (isExists(child)) {
+        tooltipdiv
+                .html('<span class="statlabel">' + axisx + ': </span><span  class="stat">' + d[axisx] + '</span>' +
+                      '<br /><span class="statlabel">School: </span><span  class="stat">' + school + '</span>' +
+                      '<br /><span class="statlabel">City: </span><span  class="stat">' + city + '</span>' +
+                      '<br /><span class="statlabel">' + globalfirstVarlabel + ': </span><span  class="stat">' + ph + '</span>' +
+                      '<br /><span class="statlabel">' + globalsecondVarlabel + ': </span><span  class="stat">' + tph + '</span>' )
+                ;
+    }
+    else {
+        tooltipdiv
+                .html('<span class="statlabel">Мedian for ' +
+                      axisx + ': </span><span  class="stat">' +
+                      d[axisx] + '</span>' +
+                      '<br /><span class="statlabel"><small>click for details</small></span>' +
+                      '<br /><span class="statlabel">' +
+                      globalfirstVarlabel + ': </span><span  class="stat">' +
+                      ph + '</span>' + '<br /><span class="statlabel">' +
+                      globalsecondVarlabel + ': </span><span  class="stat">' +
+                      tph + '</span>')
+                ;
+    }
 
     tooltipdiv
-            .html('<span class="statlabel">School: </span><span  class="stat">' + school + '</span>' +
-            '<br /><span class="statlabel">City: </span><span  class="stat">' + city + '</span>' +
-            '<br /><span class="statlabel">' + globalfirstVarlabel + '</span><span  class="stat">' + ph + '</span>' +
-            '<br /><span class="statlabel">' + globalsecondVarlabel + '</span><span  class="stat">' + tph + '</span>' )
             .style("background", function () {
                 return c(ph);
             })
@@ -833,9 +1566,10 @@ function clmove() {
 
 function clout(d) {
     var item = d3.select(this);
+    item.style("cursor", "default");
     item.transition()
             .duration(250)
-            .style("fill", c(item.attr("ph")))
+            .style("fill", c(d[globalfirstVar]))
             ;
 
     tooltipdiv
@@ -846,6 +1580,78 @@ function clout(d) {
             .style("width", "200px")
             .style("height", "90px")
             ;
+}
+
+var selectedCl = null;
+function clclick(d) {
+    var item = d3.select(this);
+    if(isExists(selectedCl)) {
+        clclose();
+        return;
+    }
+    var val = d[d3.select("#axisx").property("value")].replace(/[\s\.,]/g, "");
+    detailsCircles
+            .style("opacity", 0.2);
+    d3.select(this.parentNode)
+            .style("opacity", 1);
+    d3.selectAll(".cldetails_" + val)
+            .style("visibility", null)
+            .style("opacity", 1)
+            .selectAll("circle")
+            .transition()
+            .duration(500)
+            .attr("r", function() { return d3.select(this).attr("rt"); })
+            .attr("transform", function() { return d3.select(this).attr("transformt"); })
+            ;
+    /*d3.selectAll(".cldetails_" + val)
+        .selectAll("line")
+        .transition()
+        .duration(250)
+        .attr("x2", function() { return d3.select(this).attr("x2t"); })
+        .attr("y1", function() { return d3.select(this).attr("y1t"); })
+        .attr("y2", function() { return d3.select(this).attr("y2t"); })
+        ;*/
+
+    item.transition()
+            .duration(500)
+            .attr("r", 5);
+    selectedCl = item;
+}
+
+function clclose() {
+    d3.selectAll(".cldetailsdet")
+            .style("visibility", null)
+            .style("opacity", 1)
+            .selectAll("circle")
+            .transition()
+            .duration(500)
+            .attr("r", "")
+            .attr("transform", function() { return d3.select(this).attr("transformb"); })
+            ;
+    /*d3.selectAll(".cldetailsdet")
+            .selectAll("line")
+            .transition()
+            .duration(250)
+            .attr("x2", function() { return d3.select(this).attr("x2b"); })
+            .attr("y1", function() { return d3.select(this).attr("y1b"); })
+            .attr("y2", function() { return d3.select(this).attr("y2b"); })
+            ;*/
+
+    d3.selectAll(".cldetailsdet")
+            .style("visibility", "hidden");
+    detailsCircles
+            .transition()
+            .duration(500)
+            .style("opacity", 1);
+    detailsCircles.selectAll("circle")
+            .attr("r", function() {return d3.select(this).attr("rt");})
+            ;
+
+    if(!isExists(selectedCl))
+        return;
+
+    selectedCl.style("visibility", null);
+    selectedCl = null;
 }
 
 function changeAxis() {
@@ -886,7 +1692,7 @@ function initSelecters() {
     d3.select("#axisy").property("value", globalfirstVar);
     d3.select("#axisx").property("value", "city");
 
-    d3.selectAll("#axisx, #axisy").on("change", changeAxis);
+    d3.selectAll("#axisx, #axisy, #showalldata").on("change", changeAxis);
     d3.selectAll("#axisxbarline, #axisxbar, #axisybarline, #axisybar").on("change", showHideBars);
 }
 
@@ -1067,7 +1873,7 @@ function updateDetails(arr, axisX, axisY) {
             .attr("x", cropw - 30)
             .attr("dy", ".71em")
             .attr("text-anchor", "left")
-            .text(axisNames[axisY])
+            .text(axisNames[axisY] || axisY)
             .style("fill", d3.rgb("#5D5DE9").darker())
             ;
 
@@ -1076,7 +1882,7 @@ function updateDetails(arr, axisX, axisY) {
             .attr("transform", "translate(" + (detw - cropw) + "," + (deth + 20) + ")")
             .append("text")
             .attr("class", "astxt")
-            .attr("dy", ".71em")
+            .attr("dy", ".4em")
             .attr("text-anchor", "right")
             .text(axisNames[axisX] || axisX)
             .style("fill", d3.rgb("#5D5DE9").darker())
@@ -1108,8 +1914,8 @@ function updateDetails(arr, axisX, axisY) {
 
         rules.append("text")
                 .attr("class", "astxt")
-                .attr("x", cropw - 15)
-                .attr("dy", ".71em")
+                .attr("x", cropw - 30)
+                .attr("dy", ".4em")
                 .attr("text-anchor", "middle")
                 .text(y.tickFormat(10))
                 ;
@@ -1145,7 +1951,6 @@ function updateDetails(arr, axisX, axisY) {
         rules.append("text")
                 .attr("class", "astxt")
                 .attr("y", deth + 15)
-                .attr("dx", ".71em")
                 .attr("text-anchor", "middle")
                 .text(x.tickFormat(10))
                 ;
@@ -1153,8 +1958,6 @@ function updateDetails(arr, axisX, axisY) {
     else {
         delta = x.rangeBand() / 2;
     }
-
-    var qt = deth * 2;
 
     var rtvar = (axisY == globalsecondVar && axisX == globalfirstVar)
                 ||  (axisX == globalsecondVar && axisY == globalfirstVar)
@@ -1174,40 +1977,112 @@ function updateDetails(arr, axisX, axisY) {
         return (deth - y(d[axisY]) - deltay);
     }
 
+    var qr = 1.5;
+
     var rt = d3.scale.linear()
                 .domain(d3.extent(arr.map(rtvar)))
-                .range([3 * (qt / deth), 9 * (qt / deth)])
+                .range([3 * qr, 9 * qr])
                 ;
 
+    var detarr = arr;
+    var showAll = d3.select("#showalldata").property("checked");
+
+    if (axisXBar && !showAll) {
+        var cityies = d3.nest().key(function(d) { return d[axisX]; }).map(arr);
+
+        detarr = [];
+        for(var curcity in cityies){
+            var phm = d3.round(d3.mean(cityies[curcity], function (d) {
+                return d[globalfirstVar];
+            }), 2);
+            var tmm = d3.round(d3.mean(cityies[curcity], function (d) {
+                return d[globalsecondVar];
+            }), 2);
+            var nus = d3.round(d3.mean(cityies[curcity], function (d) {
+                return d["numberofstudents"];
+            }), 2);
+            var newdata = {};
+            newdata[axisX] = curcity;
+            newdata["city"] = newdata["city"] || "";
+            newdata["school"] = newdata["school"] || "";
+            newdata[globalfirstVar] = phm;
+            newdata[globalsecondVar] = tmm;
+            newdata["numberofstudents"] = nus;
+            detarr.push(newdata);
+        }
+    }
+
     var bars = details.selectAll("g.bars")
-        .data(arr)
+        .data(detarr)
         .enter()
         .append("svg:g")
-        .attr("class", "cldetails")
+        .on("mouseover", dtover)
+        .on("mouseout", dtout)
+        .attr("class", function(d) {
+                return "cldetails" + (axisXBar ? " textdet_" + d[axisX].replace(/[\s\.,]/g, "") : "") +
+                        (axisYBar ? " textdety_" + d[axisY].replace(/[\s\.,]/g, "") : "");
+
+        })
         .attr("transform", function (d) {
             return "translate(" + (x(d[axisX]) + delta )  + ", 0" + /*(deth - y(d[globalfirstVar])) + */")";
         })
         ;
 
+    if (axisYBar) {
+        var namesy = {};
+        bars.append("text")
+                .attr("class", "axisYBar")
+                .attr("y", function(d) {
+                    return ypos(d) - 5;
+                })
+                .attr("x", function(d) {
+                    return cropw - (x(d[axisX]) + delta - 1);
+                })
+                .text(function (d) {
+                    if (isExists(namesy[d[axisY]]))
+                        return "";
+                    namesy[d[axisY]] = true
+                    return d[axisY];
+                })
+                .style('visibility', function (d) {
+                    return ayb ? null : 'hidden';
+                })
+                ;
+    }
+
+    if (axisXBar) {
+        var namesx = {};
+        bars.append("text")
+                .attr("class", "axisXBar")
+                .attr("transform", "translate("+ -3 + "," + (deth - 2) + ")rotate(-90)")
+                .text(function (d) {
+                    if (isExists(namesx[d[axisX]]))
+                        return "";
+                    namesx[d[axisX]] = true
+                    return d[axisX];
+                })
+                .style('visibility', function (d) {
+                    return axb ? null : 'hidden';
+                })
+                ;
+    }
 
     bars.append("circle")
-        .attr("city", function (d) { return d.city; })
-        .attr("school", function (d) { return d.school; })
-        .attr("ph", function(d) { return d[globalfirstVar]; })
-        .attr("tph", function(d) { return d[globalsecondVar]; })
+        .datum(function(d) { return d; })
         .attr("r", 5)
+        .attr("transform", function (d) {
+            return "translate(0," + (deth) + ")";
+        })
         .style("fill", function (d) {
             return c(d[globalfirstVar]);
         })
         .style("stroke", function (d) {
             return d3.rgb(c(d[globalfirstVar])).darker();
         })
-        .attr("transform", function (d) {
-            return "translate(0," + (deth) + ")";
-        })
         .on("mouseover", clover)
         .on("mousemove", clmove)
         .on("mouseout", clout)
+        .on("click", !showAll ? clclick : null)
         .transition()
         .delay(100)
         .duration(800)
@@ -1215,15 +2090,19 @@ function updateDetails(arr, axisX, axisY) {
             return "translate(0," + ypos(d) + ")";
         })
         .transition()
-        .delay(100)
+        .delay(900)
         .duration(250)
         .attr("r", function (d) {
+            return rt(rtvar(d));
+        })
+        .attr("rt", function (d) {
             return rt(rtvar(d));
         })
         ;
 
     bars.append("circle")
         .attr("r", 2)
+        .attr("rt", 2)
         .style("fill", function (d) {
             return d3.rgb(c(d[globalfirstVar])).darker();
         })
@@ -1253,26 +2132,6 @@ function updateDetails(arr, axisX, axisY) {
             })
             .style("opacity", 0.4)
             ;
-
-        bars.append("text")
-            .attr("class", "axisYBar")
-            .style("fill", function (d) {
-                return "#5D5DE9";
-            })
-            .attr("y", function(d) {
-                return ypos(d) - 5;
-            })
-            .attr("x", function(d) {
-                return cropw - (x(d[axisX]) + delta - 1);
-            })
-            .text(function (d) {
-                return d[axisY];
-            })
-            .style('visibility', function (d) {
-                return ayb ? null : 'hidden';
-            })
-            .style("font-size", "11px")
-            ;
     }
 
     if (axisXBar) {
@@ -1290,35 +2149,118 @@ function updateDetails(arr, axisX, axisY) {
             })
             .style("opacity", 0.4)
             ;
+    }
 
-        bars.append("text")
-            .attr("class", "axisXBar")
-            .style("fill", function (d) {
-                return "#5D5DE9";
+    if(axisXBar && !showAll) {
+        var mid = d3.nest().key(function(d) { return d[axisX]; } ).map(detarr);
+
+        bars = details.selectAll("g.barsdet")
+            .data(arr)
+            .enter()
+            .append("svg:g")
+            .on("click", clclose)
+            .attr("class", function(d) { return "cldetailsdet cldetails_" + d[axisX].replace(/[\s\.,]/g, ""); })
+            .style("visibility", "hidden")
+            .attr("transform", function (d) {
+                return "translate(" + (x(d[axisX]) + delta )  + ", 0" + /*(deth - y(d[globalfirstVar])) + */")";
             })
-            .style("writing-mode", "tb-rl")
-            .attr("y", function (d) {
-                return deth - ((d[axisX].length) * 11 / 2);
-            })
-            .attr("x", 5)
-            .style("text-align", "right")
-            .text(function (d) {
-                return d[axisX];
-            })
-            .style('visibility', function (d) {
-                return axb ? null : 'hidden';
-            })
-            .style("font-size", "11px")
             ;
+
+        var lr = false,
+            radmove = {};
+
+        var switcher = function(d) {
+            var midr = rt(rtvar(mid[d[axisX]][0]));
+            var dn = d[axisX];
+            if(!isExists(radmove[dn]))
+                radmove[dn] = {lrad : -midr, rrad : midr };
+
+            var result = (lr = !lr)
+                   ?  (radmove[dn]["lrad"] -= rt(rtvar(d)) + midr)
+                   :  (radmove[dn]["rrad"] += rt(rtvar(d)) + midr)
+                   ;
+
+            var xd = (x(d[axisX]) + delta ) + result
+            if (xd < cropw || xd > detw)
+                result = -result
+
+            xd = (x(d[axisX]) + delta ) + result
+            if (xd < cropw || xd > detw)
+                result = result / 2;
+
+            return result;
+        }
+
+        bars.append("circle")
+            .datum(function(d) { return d; })
+            .attr("child", "true")
+            .style("fill", function (d) {
+                return c(d[globalfirstVar]);
+            })
+            .style("stroke", function (d) {
+                return d3.rgb(c(d[globalfirstVar])).darker();
+            })
+            .on("mouseover", clover)
+            .on("mousemove", clmove)
+            .on("mouseout", clout)
+            .attr("transformt", function (d) {
+                return "translate(" + switcher(d) + "," + ypos(d) + ")";
+            })
+            .attr("transform", function (d) {
+                return "translate(0," + ypos(mid[d[axisX]][0]) + ")";
+            })
+            .attr("transformb", function (d) {
+                return "translate(0," + ypos(mid[d[axisX]][0]) + ")";
+            })
+            .attr("rt", function (d) {
+                return rt(rtvar(d));
+            })
+            ;
+
+        lr = false;
+        radmove = {};
+        bars.append("circle")
+            .attr("rt", 2)
+            .style("fill", function (d) {
+                return d3.rgb(c(d[globalfirstVar])).darker();
+            })
+            .style("stroke", "none")
+            .attr("transformt", function (d) {
+                return "translate(" + switcher(d) + "," + ypos(d) + ")";
+            })
+            .attr("transformb", function (d) {
+                return "translate(0," + ypos(mid[d[axisX]][0]) + ")";
+            })
+            .attr("transform", function (d) {
+                return "translate(0," + ypos(mid[d[axisX]][0]) + ")";
+            })
+            ;
+
+        lr = false;
+        radmove = {};
+        bars.append("line")
+            .style("stroke", function (d) {
+                return d3.rgb(c(d[globalfirstVar])).darker();
+            })
+            .attr("x2", function(d) {
+                return switcher(d);
+            })
+            .attr("y1", function (d) {
+                return ypos(mid[d[axisX]][0]);
+            })
+            .attr("y2", function (d) {
+                return ypos(d);
+            })
+            .attr("x2b", 0)
+            .attr("y1b", ypos(d))
+            .attr("y2b", ypos(d))
+            .style("opacity", 0.4)
+            ;
+
     }
 
     detailsCircles = details.selectAll(".cldetails");
 }
-
-var axbl = true;
-var axb = true;
-var aybl = true;
-var ayb = true;
 
 function showHideBars() {
     if (showhideTimer != null) {
@@ -1360,610 +2302,6 @@ function showHideBars() {
     }, 350);
 }
 
-tooltipdiv = d3.select("body")
-        .append("div")
-        .attr("class", "tooltip")
-        ;
-
-function tooltipper(d) {
-    tooltipdiv
-            .html("<span class=\"statlabel\">" +
-                  globalfirstVarlabel + " </span><span class=\"stat\">" +
-                  d[firstVar] + "</span><br/><span class=\"statlabel\">" +
-                  globalsecondVarlabel + ": </span><span class=\"stat\">" +
-                  d[secondVar] + "</span><br/><span class=\"stat\">" +
-                  d.waterType + "</span><span class=\"statlabel\"> water</span><br/><span class=\"statlabel\">source: </span><span class=\"stat\">" +
-                  d.waterSource + "</span><br/><br/><span class=\"schoollabel\">(" +
-                  d.school + ", " +
-                  d.country + ")</span>")
-            .style("background", c(d[firstVar]))
-            .style("z-index", 100)
-
-            .transition()
-            .duration(250)
-            .style("opacity", 1)
-            ;
-}
-
-function toolmover() {
-    tooltipdiv
-            .style("top", d3.event.pageY > height / 2 ? (d3.event.pageY - 102) + "px" : (d3.event.pageY + 12) + "px")
-            .style("left", d3.event.pageX > width / 2 ? (d3.event.pageX - 212) + "px" : (d3.event.pageX + 12) + "px")
-            ;
-}
-
-function tooltapper() {
-    tooltipdiv
-            .transition()
-            .duration(250)
-            .style("opacity", 1e-6)
-            .style("z-index", -100)
-            ;
-}
-
-/**
- *Draw map
- **/
-//d3.json("world-countries.json", function(collection) {
-d3.json("/sites/default/files/sprint/data/world-countries.json", function (collection) {
-    feature = feature.data(collection.features)
-            .enter().append("path")
-            .attr("class", "feature")
-            .attr("d", path)
-            .style('fill', cs.map.feature.fill)
-            .style('stroke', cs.map.feature.stroke)
-            .on("mouseover", overpath)
-            .on("mousemove", moverpath)
-            .on("click", clickPath)
-            .on("mouseout", outpath)
-            ;
-
-    activeDataset = "gwe_experiment1_v1";
-
-    swap_to_Exp(cs.expI.low, cs.expI.mid, cs.expI.high,
-            "pH ", "ph", "temperature (in \u00b0C): ", "temperature");
-});
-
-
-function updateDataset() {
-
-    var picker = d3.select("#experiments").property("value");
-
-    if (activeDataset == picker)
-        return;
-    else
-        activeDataset = picker;
-
-    switch(picker) {
-        case "gwe_experiment1_v1" :
-            swap_to_Exp(cs.expI.low, cs.expI.mid, cs.expI.high,
-                    "pH", "ph", "temperature (in \u00b0C)", "temperature");
-            break;
-        case "gwe_experiment2_v1" :
-            swap_to_Exp(cs.expII.low, cs.expII.mid, cs.expII.high,
-                    "salinity ", "sanity", "salinity by weight", "sanitybyweight");
-
-            //please note: the dataset still speaks of sanity instead of salinity - this should be corrected!
-
-            //this school:
-            //{"city":"Milano","coordinates":[9.18103,45.468945],"country":"Italy","natureofthewater":"fresh","numberofstudents":19,"sanity":0.24,"sanitybyweight":24,"school":"Facoltà di Agraria-Università degli studi di Milano","sourceofwater":"Casalmaiocco (LO), tapwater","teacher":"Gigliola","waterType":"fresh","waterSource":"tap"},
-            //{"city":"Milano","coordinates":[9.18103,45.468945],"country":"Italy","natureofthewater":"fresh","numberofstudents":19,"salinity":0.62,"salinitybyweight":62,"school":"Facoltà di Agraria-Università degli Studi di Milano","sourceofwater":"Milano, tap water","teacher":"Leonardo","waterType":"fresh","waterSource":"tap"}
-
-            //seems to have accidentally swapped salinity and salinity by weight - I changed it around, but this has to be checked though!!!
-
-            break;
-        case "gwe_experiment3_v1" :
-            swap_to_Exp(cs.expIII.low, cs.expIII.mid, cs.expIII.high,
-                    "drops of bleach", "dropsofbleach", "temperature (in \u00b0C)", "temperature");
-
-            //what is up with this school? 799 dropsofbleach?!
-
-            //{"city":"Tumon","coordinates":[144.799072,13.50454],"country":"United States","dropsofbleach":799,"natureofthewater":"Fresh","numberofstudents":7,"school":"St. Johns School of Guam","sourceofwater":"Tap","teacher":"Hieter","temperature":26,"waterType":"fresh","waterSource":"tap"},	that mentiones 799 drops of bleach?! This seems unrealistically high.
-
-            //the still efficiency dataset only has one variable that has to be plotted - how can this be made to fit the experiment changer routine?
-            //	else
-            //	if (picker == "gwe_experiment4_v1") { swap_to_Exp(); }
-
-            break;
-    }
-}
-
-function swap_to_Exp(lowColor, midColor, highColor, firstVarlabel, firstVar, secondVarlabel, secondVar) {
-
-    globalfirstVar = firstVar;
-    globalsecondVar = secondVar;
-    globalfirstVarlabel = firstVarlabel;
-    globalsecondVarlabel = secondVarlabel;
-
-
-    /**
-     * Load data from JSON and draw visualization
-     **/
-//d3.json(activeDataset + ".json", function(data) {
-    d3.json("/sites/default/files/sprint/data/" + activeDataset + ".json", function (data) {
-
-        if (firstVar == "sanity") {
-            //filter out two specific data entry errors
-            data = data.filter(function (d) {
-                return d[secondVar] < 24;
-            });
-        }
-
-        if (firstVar == "dropsofbleach") {
-            //filter out one unlikely outlier
-            data = data.filter(function (d) {
-                return d[firstVar] < 799;
-            });
-        }
-
-        globalData = data;
-
-        gemfirstVar = d3.round(d3.mean(data, function (d) {
-            return d[firstVar];
-        }), 2);
-        gemsecondVar = d3.round(d3.mean(data, function (d) {
-            return d[secondVar];
-        }), 2);
-
-        reeks = data.map(function (d) {
-            return d[firstVar];
-        });
-
-        initDataCountries(data);
-
-        // scale for temperature to radius
-        r.domain(d3.extent(data.map(function (d) {
-            return d[secondVar];
-        })))
-            .range([1 * (q / width), 6 * (q / width)]);
-
-        // scale for ph to color
-        // using a manually-set low value because an extreme sample is distorting the range
-        c.domain([
-            d3.min(data, function (d) {
-                return d[firstVar];
-            }),
-            gemfirstVar,
-            d3.max(data, function (d) {
-                return d[firstVar];
-            })
-        ]).range([lowColor, midColor, highColor]);
-
-        //gather data for pies
-        //this can also be done with d3.nest to extract the variables and their lenghts, but that messes up the order of the watertypes and sources
-
-        types = [];
-        sources = [];
-
-        types.push({ "type":"fresh", "size":data.filter(
-                function (d) {
-                    return d.waterType == "fresh";
-                }).length });
-        types.push({ "type":"salt", "size":data.filter(
-                function (d) {
-                    return d.waterType == "salt";
-                }).length });
-        types.push({ "type":"unknown", "size":data.filter(
-                function (d) {
-                    return d.waterType == "unknown";
-                }).length });
-
-        sources.push({ "source":"tap", "size":data.filter(
-                function (d) {
-                    return d.waterSource == "tap";
-                }).length });
-        sources.push({ "source":"drinking supply", "size":data.filter(
-                function (d) {
-                    return d.waterSource == "drinking supply";
-                }).length });
-        sources.push({ "source":"ground", "size":data.filter(
-                function (d) {
-                    return d.waterSource == "ground";
-                }).length });
-        sources.push({ "source":"rain", "size":data.filter(
-                function (d) {
-                    return d.waterSource == "rain";
-                }).length });
-        sources.push({ "source":"stream, river, canal", "size":data.filter(
-                function (d) {
-                    return d.waterSource == "stream, river, canal";
-                }).length });
-        sources.push({ "source":"pond, lake, pool", "size":data.filter(
-                function (d) {
-                    return d.waterSource == "pond, lake, pool";
-                }).length });
-        sources.push({ "source":"ocean", "size":data.filter(
-                function (d) {
-                    return d.waterSource == "ocean";
-                }).length });
-        sources.push({ "source":"waste water", "size":data.filter(
-                function (d) {
-                    return d.waterSource == "waste water";
-                }).length });
-        sources.push({ "source":"unknown", "size":data.filter(
-                function (d) {
-                    return d.waterSource == "unknown";
-                }).length });
-
-
-        donut = d3.layout.pie().sort(null).value(function (d) {
-            return d.size;
-        });
-
-        arc = d3.svg.arc().outerRadius(rpie);
-
-        d3.selectAll("#watertypes , #watersources")
-            .on("change", null);
-
-        /**
-         *Gradient legend for pH values / needs tickmarks
-         **/
-        gradient.selectAll("stop").remove();
-
-        gradient.append("svg:stop")
-                .attr("offset", "0%")
-                .attr("stop-color", lowColor)
-                .attr("stop-opacity", 1)
-                ;
-
-        gradient.append("svg:stop")
-                .attr("offset", "50%")
-                .attr("stop-color", midColor)
-                .attr("stop-opacity", 1)
-                ;
-
-        gradient.append("svg:stop")
-                .attr("offset", "100%")
-                .attr("stop-color", highColor)
-                .attr("stop-opacity", 1)
-                ;
-
-        bakje.append("rect")
-                .attr("width", w)
-                .attr("height", h)
-                .attr("rx", "4px")
-                .attr("ry", "4px")
-                .style("fill", "url(#gradient)")
-                ;
-
-        d3.select("#bijbakje").text(firstVarlabel);
-
-        d3.selectAll("#choosers, #schaalbakje, #bijbakje, #pieHole")
-                .transition()
-                .delay(50)
-                .duration(250)
-                .style("opacity", 1)
-                ;
-
-        //the pies could me made a lot slicker by using proper updates (with tweens) instead of remove/appends
-
-        //the pies could replace the current drop downs for waterType and waterSource
-
-        d3.selectAll("#pieI, #pieII").select("svg").remove();
-
-        var visI = d3.select("#pieI")
-                .append("svg")
-                .data([types])
-                .attr("width", wpie)
-                .attr("height", hpie)
-                ;
-
-        var arcsI = visI.selectAll("g.arc")
-                .data(donut)
-                .enter().append("svg:g")
-                .attr("class", "arc")
-                .attr("transform", "translate(" + rpie + "," + rpie + ")")
-                ;
-
-        arcsI.append("path")
-                .attr("fill", function (d, i) {
-                    return typecolor(i);
-                })
-                .attr("d", arc)
-                ;
-
-        arcsI.append("title")
-                .text(function (d) {
-                    return d.data.type + ": " + d.data.size;
-                });
-
-
-        var visII = d3.select("#pieII")
-                .append("svg")
-                .data([sources])
-                .attr("width", wpie)
-                .attr("height", hpie)
-                ;
-
-        var arcsII = visII.selectAll("g.arc")
-                .data(donut)
-                .enter().append("svg:g")
-                .attr("class", "arc")
-                .attr("transform", "translate(" + rpie + "," + rpie + ")")
-                ;
-
-        arcsII.append("path")
-                .attr("fill", function (d, i) {
-                    return sourcecolor(i);
-                })
-                .attr("stroke", function (d, i) {
-                    return d3.rgb(sourcecolor(i)).darker;
-                })
-                .attr("d", arc)
-                ;
-
-        arcsII.append("title")
-                .text(function (d) {
-                    return d.data.source + ": " + d.data.size;
-                });
-
-        // refill circles
-        svg.select("#datapoints")
-                .selectAll("circle")
-                .transition()
-                .duration(1000)
-                .remove()
-                ;
-
-        svg.select("#datapoints")
-                .selectAll("circle.node")
-                .data(data)
-                .enter()
-                .append("circle")
-                .attr('class', 'measurementCircle')
-                .attr("transform", function (d) {
-                    return "translate(" + projection(d.coordinates) + ")";
-                })
-                .attr("r", 0)
-                .attr("fill", "#aaa")
-                .on("mouseover", tooltipper)
-                .on("mousemove", toolmover)
-                .on("mouseout", tooltapper)
-                .on("click", ripple)
-                .attr("visibility", function(d) {
-                    var watertype = d3.select("#watertypes").property("value");
-                    var watersource = d3.select("#watersources").property("value");
-                    return  (watertype == "" || watertype == d.waterType)
-                            && (watersource == "" || watersource == d.waterSource)
-                            ?   "visible"
-                            :   "hidden"
-                            ;
-                })
-
-                .transition()
-                .delay(100)
-                .duration(1000)
-                .attr("r", function (d) {
-                    return r(d[secondVar]);
-                })
-
-                .transition()
-                .delay(1200)
-                .duration(1250)
-                .attr("fill", function (d) {
-                    return c(d[firstVar]);
-                })
-                .attr("stroke", function (d) {
-                    return d3.rgb(c(d[firstVar])).darker();
-                });
-
-        measurementCircles = svg.select('#datapoints').selectAll('.measurementCircle');
-
-        //this is a lot of html within the code
-        d3.select("#theNumbers")
-                .html("<span class=\"statlabel\">number of measurements: </span><span class=\"stat\">" +
-                      reeks.length + "</span><br/><br/><span class=\"statlabel\">average " +
-                      firstVarlabel + " </span><span class=\"stat\">" +
-                      gemfirstVar + "</span><br/><span class=\"statlabel\">average " +
-                      secondVarlabel + ": </span><span class=\"stat\">" +
-                      gemsecondVar + "</span>");
-
-        //This is quite a lot of html code inside the d3 code - isn't there a better way to do this?
-        //The school names vary considerably in length. So sometimes they leave a lot of white space in the div, and at other times they stick out at the bottom - resolved for now because by means of a small fontsize
-        //Is it possible to have the tooltip divs automatically size according to their contents?
-
-        d3.selectAll("#watertypes , #watersources")
-                .property("value", "");
-
-        updateData();
-
-        d3.selectAll("#watertypes, #watersources").on("change", updateVisibility);
-    });
-}
-
-function updateData() {
-    if (selectedPath != null) {
-        workArr = getCountryTempr(lastData, selectedPath.datum().properties.name);
-
-        doHistogram(workArr.map(function (d) {
-                return d[globalfirstVar];
-            }));
-
-        changeAxis();
-    }
-    else
-        doHistogram();
-}
-
-
-function doHistogram(reeks) {
-
-    //histogramcode
-
-    if (!isExists(reeks))
-        reeks = window.reeks;
-
-    d3.selectAll(".grid, .tikkies, .hisrect, text")
-            .transition()
-            .duration(500)
-            .style("opacity", 1e-6)
-            .remove()
-            ;
-
-    var histogram = d3.layout.histogram()(reeks);
-
-    var x = d3.scale.ordinal()
-            .domain(histogram.map(function (d) {
-                return d.x;
-            }))
-            .rangeBands([0, histw])
-            ;
-
-    var y = d3.scale.linear()
-            .domain([0, d3.max(histogram, function (d) {
-                return d.y;
-            })])
-            .range([0, histh])
-            ;
-
-    var rules = his.selectAll("g.rule")
-            .data(y.ticks(10))
-            .enter()
-            .append("svg:g")
-            .attr("transform", function (d) {
-                return "translate(0," + (histh - y(d)) + ")";
-            })
-            .style("opacity", 1e-6)
-            ;
-
-    rules.append("line")
-            .attr("class", "tikkies")
-            .attr("x1", -1)
-            .attr("x2", -5)
-            ;
-
-    rules.append("line")
-            .attr("class", "grid")
-            .attr("x1", 1)
-            .attr("x2", histw)
-            ;
-
-    rules.append("text")
-            .attr("class", "astxt")
-            .attr("x", -15)
-            .attr("dy", ".71em")
-            .attr("text-anchor", "middle")
-            .style("display", function (d) {
-                return d == 0 ? "none" : null
-            })
-            .text(y.tickFormat(10))
-            ;
-
-    rules.transition()
-            .delay(4000)
-            .duration(250)
-            .style("opacity", 1)
-            ;
-
-    var bars = his.selectAll("g.bars")
-            .data(histogram)
-            .enter().append("svg:g")
-            .attr('class', 'histoBar')
-            .attr('id', function (d, i) {
-                return 'histoBar-' + i;
-            })
-            .attr("transform", function (d) {
-                return "translate(" + x(d.x) + "," + (histh - y(d.y)) + ")";
-            })
-            .on('mouseover', markHistogramBar)
-            .on('mouseout', unmarkHistogramBar)
-            ;
-
-    bars.append("rect")
-            .attr("class", "hisrect")
-            .attr("width", x.rangeBand())
-            .attr("y", function (d) {
-                return y(d.y);
-            })
-            .attr("height", 0)
-            .style("fill", function (d) {
-                return c(d.x);
-            })
-            .style("stroke", function (d) {
-                return d3.rgb(c(d.x)).darker();
-            })
-
-            .transition()
-            .delay(2450)
-            .duration(750)
-            .attr("height", function (d) {
-                return y(d.y);
-            })
-            .attr("y", 0)
-            ;
-
-    bars.append("text")
-            .attr("class", "bartxt")
-            .attr("x", x.rangeBand() / 2)
-            .attr("y", 0)
-            .attr("dy", "-.35em")
-            .attr("text-anchor", "middle")
-            .text(function (d) {
-                return d3.round(d.x, 1)
-            })
-            .style("opacity", 1e-6)
-
-            .transition()
-            .delay(3250)
-            .duration(750)
-            .style("opacity", 1)
-            ;
-}
-
-
-function markHistogramBar(d, i) {
-
-    // make all bars, except the hovered bar, semi transparent
-    var selectedBarId = 'histoBar-' + i;
-    his.selectAll('.histoBar')
-            .transition()
-            .duration(300)
-            .style('opacity', function (d, i) {
-                return ( d3.select(this).attr('id') != selectedBarId ) ? 0.3 : 1
-            });
-
-    highlightMeasurements(globalfirstVar, d.x, d.x + d.dx);
-}
-
-function unmarkHistogramBar(d, i) {
-
-    // remove transparency from all bars
-    his.selectAll('.histoBar').transition()
-            .duration(300)
-            .style('opacity', 1);
-
-    highlightMeasurements(null);
-
-}
-
-function highlightMeasurements(metric, lowerBound, upperBound) {
-
-    if (highlightTimer != null) {
-        clearTimeout(highlightTimer);
-    }
-
-    var watertype = d3.select("#watertypes").property("value");
-    var watersource = d3.select("#watersources").property("value");
-
-    highlightTimer = setTimeout(function () {
-
-        var needObj = measurementCircles;
-        if (isExists(detailsCircles))
-            needObj = detailsCircles;
-
-        needObj.style('visibility', function (d, i) {
-
-            if (( ( metric == null ) || ( d[ metric ] >= lowerBound && d[ metric ] <= upperBound ) ) &&
-                    (watertype == "" || watertype == d.waterType) && (watersource == "" || watersource == d.waterSource)) {
-                return null;
-            }
-            else {
-                return 'hidden';
-            }
-        });
-    }, 350);
-}
-
 /**
  * Update visibility settings based on selections
  **/
@@ -1977,11 +2315,11 @@ function updateVisibility() {
         clearTimeout(highlightTimer);
     }
 
-    var watertype = d3.select("#watertypes").property("value");
-    var watersource = d3.select("#watersources").property("value");
+    var watertype = isExists(selectedArcI) ? selectedArcI.datum().data.type || "" : "";
+    var watersource = isExists(selectedArcII) ? selectedArcII.datum().data.source || "" : "";
 
     d3.selectAll("circle")
-            .attr("visibility", function (d) {
+            .style("visibility", function (d) {
                 return (watertype == "" || watertype == d.waterType)
                         && (watersource == "" || watersource == d.waterSource)
                         ?   null
@@ -1990,8 +2328,8 @@ function updateVisibility() {
 
 
     // This bit updates the field containing the averages and other stats
-    filteredData = globalData.filter(function (d) {
-        return (watertype == "" || d.waterType == watertype) && watersource == "" || d.waterSource == watersource;
+    filteredData = dataMap[activeDataset].source.filter(function (d) {
+        return (watertype == "" || d.waterType == watertype) && (watersource == "" || d.waterSource == watersource);
     });
 
     gemfirstVar = d3.round(d3.mean(filteredData, function (d) {
@@ -2032,11 +2370,6 @@ function move() {
     //Adapt the size of the circles to de scale of the map so they don't get too small
     q = projection.scale() / 3;
     r.range([1 * (q / width), 6 * (q / width)]);
-
-    d3.select("#datapoints").selectAll("circle")
-            .attr("r", function (d) {
-                return r(d[globalsecondVar]);
-            });
 }
 
 //rippler - makes rings around the circles; nicked from Jerome Cukier's version 14
